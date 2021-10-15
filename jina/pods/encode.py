@@ -1,4 +1,4 @@
-from rocket_qa.model.src.inference_predictor import RocketPredictor
+from models.rocketqa_v1.model.src.inference_predictor import RocketPredictor
 from jina import DocumentArray, Executor, requests
 import numpy as np
 

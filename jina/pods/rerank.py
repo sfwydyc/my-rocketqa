@@ -1,4 +1,4 @@
-from rocket_qa.model.src.rocket_rerank import RocketReRanker
+from models.rocketqa_v1.model.src.rocket_rerank import RocketReRanker
 from jina import DocumentArray, Executor, Flow, requests
 import numpy as np
 
