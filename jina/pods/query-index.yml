@@ -1,0 +1,9 @@
+jtype: FaissRedisIndexer
+with:
+   index_filename: $INDEX_FILENAME
+   top_k: $QUERY_TOPK
+   host: 'localhost'
+   port: 6379
+   mode: $MODE
+metas:
+  py_modules: ./index.py

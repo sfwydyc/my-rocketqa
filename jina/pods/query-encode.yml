@@ -1,0 +1,8 @@
+jtype: RocketQAEncoder
+with:
+  use_cuda: True # TODO: once the https://github.com/jina-ai/jina/issues/2514 fixed, change it back to gpu
+  batch_size: $QUERY_BATCH_SIZE
+  init_checkpoint_dir: rocket_qa/checkpoint/marco_dual_encoder_v2
+  cls_type: query
+metas:
+  py_modules: ./encode.py
