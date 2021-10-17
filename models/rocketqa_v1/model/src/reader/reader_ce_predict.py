@@ -279,31 +279,60 @@ class BaseReader(object):
         return f
 
 
-class ClassifyReader(BaseReader):
-    def _read_tsv(self, input_file, quotechar=None, trainer_id=0, trainer_num=1, num_examples=0):
-        """Reads a tab separated value file."""
-        with open(input_file, 'r', encoding='utf8') as f:
-            reader = csv_reader(f, trainer_id=trainer_id, trainer_num=trainer_num)
-#            headers = next(reader)
-            headers = 'query\ttitle\tpara\tlabel'.split('\t')
-            text_indices = [
-                index for index, h in enumerate(headers) if h != "label"
-            ]
-            Example = namedtuple('Example', headers)
+class CEPredictorReader(BaseReader):
 
-            examples = []
-            for cnt, line in enumerate(reader):
-                if num_examples != 0 and cnt == num_examples:
-                    break
-                for index, text in enumerate(line):
-                    if index in text_indices:
-                        if self.for_cn:
-                            line[index] = text.replace(' ', '')
-                        else:
-                            line[index] = text
-                example = Example(*line)
-                examples.append(example)
-            return examples
+    def data_generator(self,
+                       batch_samples,
+                       batch_size,
+                       epoch,
+                       dev_count=1,
+                       trainer_id=0,
+                       trainer_num=1,
+                       shuffle=True,
+                       phase=None):
+
+        examples = self._read_samples(batch_samples)
+
+        def wrapper():
+            all_dev_batches = []
+            for batch_data in self._prepare_batch_data(
+                    examples, batch_size, phase=phase):
+                if len(all_dev_batches) < dev_count:
+                    all_dev_batches.append(batch_data)
+                if len(all_dev_batches) == dev_count:
+                    for batch in all_dev_batches:
+                        yield batch
+                    all_dev_batches = []
+
+        def f():
+            try:
+                for i in wrapper():
+                    yield i
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+        return f
+
+    def _read_samples(self, batch_samples):
+        """Reads a tab separated line."""
+        headers = 'query\ttitle\tpara\tlabel'.split('\t')
+        text_indices = [
+            index for index, h in enumerate(headers) if h != "label"
+        ]
+        Example = namedtuple('Example', headers)
+
+        examples = []
+        for cnt, line in enumerate(data):
+            line = line.rstrip('\n').split('\t')
+            for index, text in enumerate(line):
+                if index in text_indices:
+                    if self.for_cn:
+                        line[index] = text.replace(' ', '')
+                    else:
+                        line[index] = text
+            example = Example(*line)
+            examples.append(example)
+        return examples
 
     def _pad_batch_records(self, batch_records):
         batch_token_ids = [record.token_ids for record in batch_records]

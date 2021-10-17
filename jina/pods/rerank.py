@@ -1,12 +1,12 @@
-from models.rocketqa_v1.model.src.rocket_rerank import RocketReRanker
+from models.rocketqa_v1.model.src.predict_ce import CEPredictor
 from jina import DocumentArray, Executor, Flow, requests
 import numpy as np
 
 class RocketQAReRanker(Executor):
 
-    def __init__(self,use_cuda,batch_size,init_checkpoint_dir,**kwargs):
+    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, **kwargs):
         super().__init__(**kwargs)
-        self.model = RocketReRanker(use_cuda,batch_size,init_checkpoint_dir)
+        self.model = CEPredictor(conf_path, use_cuda, gpu_card_id, batch_size)
 
     @requests(on='/rerank')
     def rerank(self,docs: DocumentArray, **kwargs):

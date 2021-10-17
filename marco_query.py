@@ -2,6 +2,7 @@ import os
 import click
 import paddle
 from jina import Document,DocumentArray,Flow,Executor,requests
+
 os.environ['FLAGS_eager_delete_tensor_gb'] = '0'  # enable gc
 # paddle.set_device('cpu')
 paddle.enable_static()
@@ -28,7 +29,6 @@ def print_topk(req_obj, sentence, rerank=False):
 def main(top_k, index_filename, rerank=False):
     os.environ['QUERY_TOPK'] = os.environ.get('QUERY_TOPK', str(top_k))
     os.environ['INDEX_FILENAME'] = os.environ.get('INDEX_FILENAME', index_filename)
-    os.environ['QUERY_BATCH_SIZE'] = '1'
     #os.environ['JINA_MP_START_METHOD'] = 'spawn'
 
     f = Flow().add(uses='jina/pods/query-encode.yml').add(uses='jina/pods/query-index.yml').add(uses='jina/pods/res-rank.yml')

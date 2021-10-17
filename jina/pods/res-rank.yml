@@ -1,7 +1,8 @@
 jtype: RocketQAReRanker
 with:
+  conf_path: models/rocketqa_v1/model/config/ce_config.json
   use_cuda: False
+  gpu_card_id: 5
   batch_size: 32 #$QUERY_BATCH_SIZE # TODO: set this in py files, this is related to query topk
-  init_checkpoint_dir: models/rocketqa_v1/checkpoint/marco_cross_encoder_large
 meta:
   py_modules: ./rerank.py

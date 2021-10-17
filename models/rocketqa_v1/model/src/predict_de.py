@@ -20,8 +20,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import os
-import time
-import logging
+import json
 import multiprocessing
 import numpy as np
 
@@ -32,45 +31,34 @@ os.environ['FLAGS_eager_delete_tensor_gb'] = '0'  # enable gc
 
 import paddle.fluid as fluid
 
-from .reader import reader_de_infer as reader_de_infer
+from .reader import reader_de_predict
 from .model.ernie import ErnieConfig
-from .finetune.dual_encoder_infer import create_model, predict
+from .finetune.dual_encoder_infer_dyc import create_model, predict
 from .utils.args import print_arguments, check_cuda, prepare_logger
 from .utils.init import init_pretraining_params, init_checkpoint
 from .finetune_args import parser
 from pathlib import PurePath
 
-args = parser.parse_args()
-args.use_fast_executor = True
-args.do_train = False
-args.do_val = False
-args.do_test = True
-args.q_max_seq_len = 32
-args.p_max_seq_len = 128
-conf_path = PurePath(os.path.dirname(os.path.realpath(__file__))).parent / 'config'
-args.vocab_path = str(conf_path / 'vocab.txt')
-args.ernie_config_path = str(conf_path / 'base/ernie_config.json')
 
-class RocketPredictor(object):
+class DEPredictor(object):
 
-    def __init__(self,use_cuda,batch_size,init_checkpoint_dir,cls_type):
-        self.ernie_config = ErnieConfig(args.ernie_config_path)
-        self.ernie_config.print_config()
-        args.batch_size = batch_size
-        args.init_checkpoint = init_checkpoint_dir
+    def __init__(self, conf_path, use_cuda, gpu_card_id, cls_type):
+        args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
+        ernie_config = ErnieConfig(args.ernie_config_path)
+        ernie_config.print_config()
         self.cls_type = cls_type
 
         if args.use_cuda:
             dev_list = fluid.cuda_places()
-            place = dev_list[5]
+            place = dev_list[gpu_card_id]
             dev_count = len(dev_list)
         else:
             place = fluid.CPUPlace()
             dev_count = int(os.environ.get('CPU_NUM', multiprocessing.cpu_count()))
         self.exe = fluid.Executor(place)
 
-        self.reader = reader_de_infer.ListClassifyReader(
+        self.reader = reader_de_predict.DEPredictorReader(
             vocab_path=args.vocab_path,
             label_map_config=args.label_map_config,
             q_max_seq_len=args.q_max_seq_len,
@@ -90,8 +78,7 @@ class RocketPredictor(object):
                 self.test_pyreader, self.graph_vars = create_model(
                     args,
                     pyreader_name='test_reader',
-                    ernie_config=self.ernie_config,
-                    batch_size=args.batch_size,
+                    ernie_config=ernie_config,
                     is_prediction=True)
 
         self.test_prog = self.test_prog.clone(for_test=True)
@@ -107,11 +94,31 @@ class RocketPredictor(object):
             args.init_checkpoint,
             main_program=startup_prog)
 
-    def get_cls_feats(self,data):
+    def _parse_args(self, conf_path):
+        args = parser.parse_args()
+        try:
+            with open(conf_path, 'r', encoding='utf8') as json_file:
+                config_dict = json.load(json_file)
+        except Exception:
+            raise IOError("Error in parsing model config file '%s'" %conf_path)
+
+        args.do_train = False
+        args.do_val = False
+        args.do_test = True
+        args.use_fast_executor = True
+        args.q_max_seq_len = config_dict['q_max_seq_len']
+        args.p_max_seq_len = config_dict['p_max_seq_len']
+        args.ernie_config_path = config_dict['model_conf_path']
+        args.vocab_path = config_dict['model_vocab_path']
+        args.init_checkpoint = config_dict['model_checkpoint_path']
+
+        return args
+
+
+    def get_cls_feats(self, data):
 
         self.test_pyreader.decorate_tensor_provider(
-            self.reader.data_generator(data,batch_size=args.batch_size,
-                epoch=1, shuffle=False))
+            self.reader.data_generator(data, shuffle=False))
 
         self.test_pyreader.start()
         fetch_list = [self.graph_vars["q_rep"].name, self.graph_vars["p_rep"].name]
@@ -133,3 +140,4 @@ class RocketPredictor(object):
                 break
 
         return np.concatenate(embs)[:len(data)]
+
