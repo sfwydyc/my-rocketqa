@@ -2,5 +2,5 @@
     "max_seq_len": 160,
     "model_conf_path": "models/rocketqa_v1/model/config/large/ernie_config.json",
     "model_vocab_path": "models/rocketqa_v1/model/config/vocab.txt",
-   "model_checkpoint_path": "models/rocketqa_v1/checkpoint/marco_cross_encoder_large"
+    "model_checkpoint_path": "models/rocketqa_v1/checkpoint/marco_cross_encoder_large"
 }
