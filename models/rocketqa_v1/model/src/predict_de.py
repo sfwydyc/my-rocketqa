@@ -33,7 +33,7 @@ import paddle.fluid as fluid
 
 from .reader import reader_de_predict
 from .model.ernie import ErnieConfig
-from .finetune.dual_encoder_infer_dyc import create_model, predict
+from .finetune.dual_encoder_predict import create_model, predict
 from .utils.args import print_arguments, check_cuda, prepare_logger
 from .utils.init import init_pretraining_params, init_checkpoint
 from .finetune_args import parser
@@ -42,11 +42,12 @@ from pathlib import PurePath
 
 class DEPredictor(object):
 
-    def __init__(self, conf_path, use_cuda, gpu_card_id, cls_type):
+    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, cls_type):
         args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
         ernie_config = ErnieConfig(args.ernie_config_path)
         ernie_config.print_config()
+        self.batch_size = batch_size
         self.cls_type = cls_type
 
         if args.use_cuda:
@@ -118,7 +119,7 @@ class DEPredictor(object):
     def get_cls_feats(self, data):
 
         self.test_pyreader.decorate_tensor_provider(
-            self.reader.data_generator(data, shuffle=False))
+            self.reader.data_generator(data, self.batch_size, shuffle=False))
 
         self.test_pyreader.start()
         fetch_list = [self.graph_vars["q_rep"].name, self.graph_vars["p_rep"].name]

@@ -1,0 +1,7 @@
+{
+    "q_max_seq_len": 32,
+    "p_max_seq_len": 128,
+    "model_conf_path": "models/rocketqa_v1/model/config/base/en_config.json",
+    "model_vocab_path": "models/rocketqa_v1/model/config/en_vocab.txt",
+    "model_checkpoint_path": "models/rocketqa_v1/checkpoint/marco_dual_encoder_v2"
+}

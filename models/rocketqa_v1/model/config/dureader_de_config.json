@@ -1,0 +1,7 @@
+{
+    "q_max_seq_len": 32,
+    "p_max_seq_len": 384,
+    "model_conf_path": "models/rocketqa_v1/model/config/base/zh_config.json",
+    "model_vocab_path": "models/rocketqa_v1/model/config/zh_vocab.txt",
+    "model_checkpoint_path": "models/rocketqa_v1/checkpoint/dureader_dual_encoder_round1"
+}

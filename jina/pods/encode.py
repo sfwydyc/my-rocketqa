@@ -4,9 +4,9 @@ import numpy as np
 
 class RocketQAEncoder(Executor):
 
-    def __init__(self, conf_path, use_cuda, gpu_card_id, cls_type, **kwargs):
+    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, cls_type, **kwargs):
         super().__init__(**kwargs)
-        self.model = DEPredictor(conf_path, use_cuda, gpu_card_id, cls_type)
+        self.model = DEPredictor(conf_path, use_cuda, gpu_card_id, batch_size, cls_type)
 
     @requests
     def encode(self, docs: DocumentArray, **kwargs):
