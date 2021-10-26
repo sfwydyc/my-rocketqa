@@ -41,13 +41,12 @@ from utils.finetune_args import parser
 
 class DualEncoder(object):
 
-    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, cls_type):
+    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, **kwargs):
         args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
         ernie_config = ErnieConfig(args.ernie_config_path)
         ernie_config.print_config()
         self.batch_size = batch_size
-        self.cls_type = cls_type
 
         if args.use_cuda:
             dev_list = fluid.cuda_places()
@@ -77,9 +76,10 @@ class DualEncoder(object):
             with fluid.unique_name.guard():
                 self.test_pyreader, self.graph_vars = create_model(
                     args,
-                    pyreader_name='test_reader',
+                    pyreader_name=args.model_name + '_test_reader',
                     ernie_config=ernie_config,
-                    is_prediction=True)
+                    is_prediction=True,
+                    share_parameter=args.share_parameter)
 
         self.test_prog = self.test_prog.clone(for_test=True)
 
@@ -111,11 +111,23 @@ class DualEncoder(object):
         args.ernie_config_path = config_dict['model_conf_path']
         args.vocab_path = config_dict['model_vocab_path']
         args.init_checkpoint = config_dict['model_checkpoint_path']
+        if 'model_name' in config_dict:
+            args.model_name = config_dict['model_name']
+        else:
+            args.model_name = 'my_de'
+        if 'share_parameter' in config_dict:
+            args.share_parameter = config_dict['share_parameter']
+        else:
+            args.share_parameter = 0
 
         return args
 
 
-    def get_representation(self, data):
+    def encode_query(self, query):
+
+        data = []
+        for q in query:
+            data.append(q + '\t-\t-')
 
         self.test_pyreader.decorate_tensor_provider(
             self.reader.data_generator(
@@ -124,24 +136,85 @@ class DualEncoder(object):
                 shuffle=False))
 
         self.test_pyreader.start()
-        fetch_list = [self.graph_vars["q_rep"].name, self.graph_vars["p_rep"].name]
+        fetch_list = [self.graph_vars["q_rep"]]
         embs = []
 
         while True:
             try:
-
-                q_rep, p_rep = self.exe.run(program=self.test_prog,
+                q_rep = self.exe.run(program=self.test_prog,
                                                 fetch_list=fetch_list)
-
-                if self.cls_type == 'query':
-                    embs.append(q_rep)
-                elif self.cls_type == 'para':
-                    embs.append(p_rep)
-                print (len(embs))
-
+                embs.append(q_rep[0])
             except fluid.core.EOFException:
                 self.test_pyreader.reset()
                 break
 
         return np.concatenate(embs)[:len(data)]
+
+
+    def encode_para(self, para, title=[]):
+
+        data = []
+        if len(title) != 0:
+            assert len(para) == len(title)
+            for t, p in zip(title, para):
+                data.append('-\t' + t + '\t' + p)
+        else:
+            for p in para:
+                data.append('-\t-\t' + p)
+
+        self.test_pyreader.decorate_tensor_provider(
+            self.reader.data_generator(
+                data,
+                self.batch_size,
+                shuffle=False))
+
+        self.test_pyreader.start()
+        fetch_list = [self.graph_vars["p_rep"]]
+        embs = []
+
+        while True:
+            try:
+                p_rep = self.exe.run(program=self.test_prog,
+                                                fetch_list=fetch_list)
+                embs.append(p_rep[0])
+            except fluid.core.EOFException:
+                self.test_pyreader.reset()
+                break
+
+        return np.concatenate(embs)[:len(data)]
+
+
+    def matching(self, query, para, title=[]):
+
+        data = []
+        assert len(para) == len(query)
+        if len(title) != 0:
+            assert len(para) == len(title)
+            for q, t, p in zip(query, title, para):
+                data.append(q + '\t' + t + '\t' + p)
+        else:
+            for q, p in para:
+                data.append(q + '\t-\t' + p)
+
+        self.test_pyreader.decorate_tensor_provider(
+            self.reader.data_generator(
+                data,
+                self.batch_size,
+                shuffle=False))
+
+        self.test_pyreader.start()
+        fetch_list = [self.graph_vars["probs"]]
+        inner_probs = []
+
+        while True:
+            try:
+                probs = self.exe.run(program=self.test_prog,
+                                                fetch_list=fetch_list)
+                inner_probs.extend(probs[0].tolist())
+            except fluid.core.EOFException:
+                self.test_pyreader.reset()
+                break
+
+        #return np.concatenate(embs)[:len(data)]
+        return inner_probs
 

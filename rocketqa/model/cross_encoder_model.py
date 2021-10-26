@@ -35,7 +35,8 @@ def create_model(args,
                  pyreader_name,
                  ernie_config,
                  is_prediction=False,
-                 task_name=""):
+                 task_name="",
+                 joint_training=0):
     pyreader = fluid.layers.py_reader(
         capacity=50,
         shapes=[[-1, args.max_seq_len, 1], [-1, args.max_seq_len, 1],
@@ -52,30 +53,57 @@ def create_model(args,
      qids) = fluid.layers.read_file(pyreader)
 
     def _model(is_noise=False):
-        ernie = ErnieModel(
-            src_ids=src_ids,
-            position_ids=pos_ids,
-            sentence_ids=sent_ids,
-            task_ids=task_ids,
-            input_mask=input_mask,
-            config=ernie_config,
-            is_noise=is_noise)
+        if joint_training == 1:
+            ernie = ErnieModel(
+                src_ids=src_ids,
+                position_ids=pos_ids,
+                sentence_ids=sent_ids,
+                task_ids=task_ids,
+                input_mask=input_mask,
+                config=ernie_config,
+                is_noise=is_noise,
+                model_name='qtp_')
+            cls_feats = ernie.get_pooled_output(joint_training=1)
+        else:
+            ernie = ErnieModel(
+                src_ids=src_ids,
+                position_ids=pos_ids,
+                sentence_ids=sent_ids,
+                task_ids=task_ids,
+                input_mask=input_mask,
+                config=ernie_config,
+                is_noise=is_noise)
+            cls_feats = ernie.get_pooled_output()
 
-        cls_feats = ernie.get_pooled_output()
         if not is_noise:
             cls_feats = fluid.layers.dropout(
             x=cls_feats,
             dropout_prob=0.1,
             dropout_implementation="upscale_in_train")
-        logits = fluid.layers.fc(
-            input=cls_feats,
-            size=args.num_labels,
-            param_attr=fluid.ParamAttr(
-                name=task_name + "_cls_out_w",
-                initializer=fluid.initializer.TruncatedNormal(scale=0.02)),
-            bias_attr=fluid.ParamAttr(
-                name=task_name + "_cls_out_b",
-                initializer=fluid.initializer.Constant(0.)))
+
+        if joint_training == 1:
+            logits = fluid.layers.fc(
+                input=cls_feats,
+                size=1,
+                param_attr=fluid.ParamAttr(
+                    name="qtp__cls_out_w",
+                    initializer=fluid.initializer.TruncatedNormal(scale=0.02)),
+                bias_attr=fluid.ParamAttr(
+                    name="qtp__cls_out_b",
+                    initializer=fluid.initializer.Constant(0.)))
+            probs = logits
+
+        else:
+            logits = fluid.layers.fc(
+                input=cls_feats,
+                size=args.num_labels,
+                param_attr=fluid.ParamAttr(
+                    name=task_name + "_cls_out_w",
+                    initializer=fluid.initializer.TruncatedNormal(scale=0.02)),
+                bias_attr=fluid.ParamAttr(
+                    name=task_name + "_cls_out_b",
+                    initializer=fluid.initializer.Constant(0.)))
+            probs = fluid.layers.softmax(logits)
 
         """
         if is_prediction:
@@ -88,20 +116,8 @@ def create_model(args,
             return pyreader, probs, feed_targets_name
         """
 
-        num_seqs = fluid.layers.create_tensor(dtype='int64')
-        ## add focal loss
-        ce_loss, probs = fluid.layers.softmax_with_cross_entropy(
-            logits=logits, label=labels, return_softmax=True)
-        loss = fluid.layers.mean(x=ce_loss)
-        accuracy = fluid.layers.accuracy(
-            input=probs, label=labels, total=num_seqs)
         graph_vars = {
-            "loss": loss,
             "probs": probs,
-            "accuracy": accuracy,
-            "labels": labels,
-            "num_seqs": num_seqs,
-            "qids": qids
         }
         return graph_vars
 

@@ -36,7 +36,8 @@ def create_model(args,
                  pyreader_name,
                  ernie_config,
                  is_prediction=False,
-                 task_name=""):
+                 task_name="",
+                 share_parameter=0):
     pyreader = fluid.layers.py_reader(
         capacity=50,
         shapes=[[-1, args.q_max_seq_len, 1], [-1, args.q_max_seq_len, 1],
@@ -57,14 +58,25 @@ def create_model(args,
      src_ids_p, sent_ids_p, pos_ids_p, task_ids_p, input_mask_p,
      labels, qids) = fluid.layers.read_file(pyreader)
 
-    ernie_q = ErnieModel(
-        src_ids=src_ids_q,
-        position_ids=pos_ids_q,
-        sentence_ids=sent_ids_q,
-        task_ids=task_ids_q,
-        input_mask=input_mask_q,
-        config=ernie_config,
-        model_name='query_')
+    if share_parameter == 0:
+        ernie_q = ErnieModel(
+            src_ids=src_ids_q,
+            position_ids=pos_ids_q,
+            sentence_ids=sent_ids_q,
+            task_ids=task_ids_q,
+            input_mask=input_mask_q,
+            config=ernie_config,
+            model_name='query_')
+    else:
+        ernie_q = ErnieModel(
+            src_ids=src_ids_q,
+            position_ids=pos_ids_q,
+            sentence_ids=sent_ids_q,
+            task_ids=task_ids_q,
+            input_mask=input_mask_q,
+            config=ernie_config,
+            model_name='titlepara_')
+
     ## pos para
     ernie_p = ErnieModel(
         src_ids=src_ids_p,
@@ -79,8 +91,8 @@ def create_model(args,
     p_cls_feats = ernie_p.get_cls_output()
 
     #multiply
-    logits = fluid.layers.matmul(q_cls_feats, p_cls_feats, transpose_x=False, transpose_y=True)
-    probs = logits
+    multi = fluid.layers.elementwise_mul(q_cls_feats, p_cls_feats)
+    probs = fluid.layers.reduce_sum(multi, dim=-1)
 
     graph_vars = {
         "probs": probs,

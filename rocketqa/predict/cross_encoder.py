@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import os
 import json
 import multiprocessing
+import random
 import numpy as np
 
 # NOTE(paddle-dev): All of these flags should be
@@ -40,7 +41,7 @@ from utils.finetune_args import parser
 
 
 class CrossEncoder(object):
-    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size):
+    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, **kwargs):
         args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
         self.batch_size = batch_size
@@ -77,9 +78,10 @@ class CrossEncoder(object):
             with fluid.unique_name.guard():
                 self.test_pyreader, self.graph_vars = create_model(
                     args,
-                    pyreader_name='test_reader',
+                    pyreader_name=args.model_name + '_test_reader',
                     ernie_config=ernie_config,
-                    is_prediction=True)
+                    is_prediction=True,
+                    joint_training=self.joint_training)
 
         self.test_prog = self.test_prog.clone(for_test=True)
 
@@ -111,31 +113,50 @@ class CrossEncoder(object):
         args.ernie_config_path = config_dict['model_conf_path']
         args.vocab_path = config_dict['model_vocab_path']
         args.init_checkpoint = config_dict['model_checkpoint_path']
+        if 'model_name' in config_dict:
+            args.model_name = config_dict['model_name']
+        else:
+            args.model_name = 'my_ce'
+
+        if "joint_training" in config_dict:
+            self.joint_training = config_dict['joint_training']
+        else:
+            self.joint_training = 0
 
         return args
 
 
-    def get_rank_score(self, data):
+    def matching(self, query, para, title=[]):
+
+        data = []
+        assert len(para) == len(query)
+        if len(title) != 0:
+            assert len(para) == len(title)
+            for q, t, p in zip(query, title, para):
+                data.append(q + '\t' + t + '\t' + p)
+        else:
+            for q, p in para:
+                data.append(q + '\t-\t' + p)
 
         self.test_pyreader.decorate_tensor_provider(
             self.reader.data_generator(
                 data,
                 batch_size=self.batch_size,
-                epoch=1,
-                dev_count=1,
                 shuffle=False))
 
         self.test_pyreader.start()
         fetch_list = [self.graph_vars["probs"].name]
         probs = []
-        preds = []
 
         while True:
             try:
                 fetch_result = self.exe.run(program=self.test_prog,
                                             fetch_list=fetch_list)
                 np_probs = fetch_result[0]
-                probs.extend(np_probs[:, 1].reshape(-1).tolist())
+                if self.joint_training == 0:
+                    probs.extend(np_probs[:, 1].reshape(-1).tolist())
+                else:
+                    probs.extend(np_probs.reshape(-1).tolist())
             except fluid.core.EOFException:
                 self.test_pyreader.reset()
                 break

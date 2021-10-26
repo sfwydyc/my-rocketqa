@@ -235,10 +235,6 @@ class BaseReader(object):
     def data_generator(self,
                        input_file,
                        batch_size,
-                       epoch,
-                       dev_count=1,
-                       trainer_id=0,
-                       trainer_num=1,
                        shuffle=True,
                        phase=None):
 
@@ -283,10 +279,7 @@ class CEPredictorReader(BaseReader):
     def data_generator(self,
                        batch_samples,
                        batch_size,
-                       epoch,
                        dev_count=1,
-                       trainer_id=0,
-                       trainer_num=1,
                        shuffle=True,
                        phase=None):
 
