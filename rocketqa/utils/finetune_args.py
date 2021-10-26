@@ -22,7 +22,7 @@ import os
 import time
 import argparse
 
-from utils.args import ArgumentGroup
+from rocketqa.utils.args import ArgumentGroup
 
 # yapf: disable
 parser = argparse.ArgumentParser(__doc__)

@@ -32,12 +32,12 @@ os.environ['FLAGS_eager_delete_tensor_gb'] = '0'  # enable gc
 
 import paddle.fluid as fluid
 
-from reader import reader_ce_predict
-from model.ernie import ErnieConfig
-from model.cross_encoder_model import create_model
-from utils.args import print_arguments, check_cuda, prepare_logger
-from utils.init import init_pretraining_params, init_checkpoint
-from utils.finetune_args import parser
+from rocketqa.reader import reader_ce_predict
+from rocketqa.model.ernie import ErnieConfig
+from rocketqa.model.cross_encoder_model import create_model
+from rocketqa.utils.args import print_arguments, check_cuda, prepare_logger
+from rocketqa.utils.init import init_pretraining_params, init_checkpoint
+from rocketqa.utils.finetune_args import parser
 
 
 class CrossEncoder(object):

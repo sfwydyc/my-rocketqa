@@ -27,8 +27,8 @@ import six
 from io import open
 from collections import namedtuple
 
-from utils import tokenization
-from utils.batching import pad_batch_data
+from rocketqa.utils import tokenization
+from rocketqa.utils.batching import pad_batch_data
 
 
 log = logging.getLogger(__name__)
