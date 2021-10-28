@@ -2,8 +2,8 @@
 
 This repository provides a simple and efficient toolkit for running RocketQA models and build a QA-system. 
 
-## What is RocketQA
-RocketQA is a series of dense retrieval models for Open-Domain Question Answering. 
+## RocketQA
+**RocketQA** is a series of dense retrieval models for Open-Domain Question Answering. 
 
 Open-Domain Question Answering aims to find the answers to natural language questions from a large collection of documents. Common approachs often contain two stages, firstly a dense retriever select a few revelant contexts, and then a neural reader extracts the answer.
 
@@ -19,7 +19,7 @@ RocketQA focus on improving the dense contexts retrieval stage, and propose the 
 * ***State-of-the-art***, RocketQA models achieve SOTA performance in MSMARCO passage ranking dataset and Natural Question dataset.
 * ***First-Chinese-model***, RocketQA-zh is the first open source Chinese dense retrieval model.
 * ***Easy-to-use***, require two lines of Python code to get query/passage's representation.
-* ***Complete-solution-for-QA***, dense retriever, passage ranker and neural reader is provided, require a few lines of code to build a QA system.
+* ***Solution-for-QA-system***, dense retriever, passage ranker and neural reader is provided, allowing developers to build a QA system with a few lines of code.
 
 
 ## Installation
