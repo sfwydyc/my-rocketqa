@@ -4,8 +4,7 @@ RocketQA is a series of dense retrieval models for Open-Domain Question Answerin
 Open-Domain Question Answering aims to find the answers to natural language questions from a large collection of documents. Common approachs often contain two stages, firstly a dense retriever select a few revelant contexts, and then a neural reader extracts the answer.
 
 RocketQA focus on improving the dense contexts retrieval stage, and propose the following methods:
-#### 1. [[RocketQA: An Optimized Training Approach to Dense Passage Retrieval
-for Open-Domain Question Answering]](https://arxiv.org/pdf/2010.08191.pdf)  [[code]](https://github.com/PaddlePaddle/Research/tree/master/NLP/NAACL2021-RocketQA)
+#### 1. [[RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering]](https://arxiv.org/pdf/2010.08191.pdf)  [[code]](https://github.com/PaddlePaddle/Research/tree/master/NLP/NAACL2021-RocketQA)
 
 #### 2. [[PAIR: Leveraging Passage-Centric Similarity Relation for Improving Dense Passage Retrieval]](https://aclanthology.org/2021.findings-acl.191.pdf)  [[code]](https://github.com/PaddlePaddle/Research/tree/master/NLP/ACL2021-PAIR)
 
