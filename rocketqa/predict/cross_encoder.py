@@ -42,7 +42,10 @@ from rocketqa.utils.finetune_args import parser
 
 class CrossEncoder(object):
     def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, **kwargs):
-        args = self._parse_args(conf_path)
+        if "model_path" in kwargs:
+            args = self._parse_args(conf_path, model_path=kwargs["model_path"])
+        else:
+            args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
         self.batch_size = batch_size
         ernie_config = ErnieConfig(args.ernie_config_path)
@@ -97,7 +100,7 @@ class CrossEncoder(object):
             main_program=startup_prog)
 
 
-    def _parse_args(self, conf_path):
+    def _parse_args(self, conf_path, model_path=''):
         args = parser.parse_args()
         try:
             with open(conf_path, 'r', encoding='utf8') as json_file:
@@ -110,9 +113,9 @@ class CrossEncoder(object):
         args.do_test = True
         args.use_fast_executor = True
         args.max_seq_len = config_dict['max_seq_len']
-        args.ernie_config_path = config_dict['model_conf_path']
-        args.vocab_path = config_dict['model_vocab_path']
-        args.init_checkpoint = config_dict['model_checkpoint_path']
+        args.ernie_config_path = model_path + config_dict['model_conf_path']
+        args.vocab_path = model_path + config_dict['model_vocab_path']
+        args.init_checkpoint = model_path + config_dict['model_checkpoint_path']
         if 'model_name' in config_dict:
             args.model_name = config_dict['model_name']
         else:

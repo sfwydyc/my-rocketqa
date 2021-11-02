@@ -9,25 +9,53 @@ from rocketqa.predict.cross_encoder import CrossEncoder
 paddle.enable_static()
 
 
-#def available_models():
+__MODELS = {
+    "v1_marco_de": "-",
+    "v1_marco_ce": "-",
+    "v1_nq_de": "-",
+    "v1_nq_ce": "-",
+    "pair_marco_de": "-",
+    "pair_nq_de": "-",
+    "v2_marco_de": "-",
+    "v2_marco_ce": "-",
+    "v2_nq": "-",
+    "zh_dureader_de": "-",
+    "zh_dureader_ce": "-"
+}
+
+
+def available_models():
+    return __MODELS.keys()
 
 
 def load_model(encoder_conf):
 
     model_type = ''
     model_name = ''
+    official_model = False
     encoder = None
 
-    official_model = False
     if "model_name" in encoder_conf:
         model_name = encoder_conf['model_name']
-        if model_name.find("_de") >= 0:
-            model_type = 'dual_encoder'
-        elif model_name.find("_ce") >= 0:
-            model_type = 'cross_encoder'
-        official_model = True
+        print (model_name)
+        if model_name in __MODELS:
+            official_model = True
+            model_path = os.path.expanduser('~/.rocketqa/') + model_name + '/'
+            if not os.path.exists(model_path):
+                __download(model_name)
+            encoder_conf['conf_path'] = model_path + 'config.json'
+            encoder_conf['model_path'] = model_path
+            if model_name.find("_de") >= 0:
+                model_type = 'dual_encoder'
+            elif model_name.find("_ce") >= 0:
+                model_type = 'cross_encoder'
+        else:
+            print ("not official model")
 
     if official_model is False:
+        assert ("conf_path" in encoder_conf), "[conf_path] not found in config file"
+        conf_path = encoder_conf['conf_path']
+        assert (os.path.isfile(conf_path)), "[%s] not exists" %(conf_path)
         try:
             with open(conf_path, 'r', encoding='utf8') as json_file:
                 config_dict = json.load(json_file)
@@ -45,48 +73,9 @@ def load_model(encoder_conf):
 
     return encoder
 
+
+def __download(model_name):
+    pass
+
 if __name__ == '__main__':
-    de_conf = {
-        "model_name": "v1_marco_de",
-        "conf_path": "/mnt/dqa/dingyuchen/irqa_jina/checkpoints/rocketqa_v1/marco_de/marco_de_config.json",
-        "use_cuda": True,
-        "gpu_card_id": 2,
-        "batch_size": 32
-    }
-    ce_conf = {
-        "model_name": "zh_dureader_ce",
-        "conf_path": "/mnt/dqa/dingyuchen/irqa_jina/checkpoints/rocketqa_zh/dureader_ce/dureader_ce_config.json",
-        "use_cuda": True,
-        "gpu_card_id": 2,
-        "batch_size": 32
-    }
-
-    query_list = []
-    para_list = []
-    title_list = []
-    marco_data = '../data/dev.qtpl.top1k'
-    dureader_data = '../data/durd_test.top50.top1k'
-    for line in open(dureader_data):
-        q, t, p, _ = line.strip().split('\t')
-        query_list.append(q)
-        para_list.append(p)
-        title_list.append(t)
-
-    """
-    dual_encoder = load(de_conf)
-    q_embs = dual_encoder.encode_query(query=query_list)
-    for q in q_embs:
-        print (' '.join(str(ii) for ii in q))
-    p_embs = dual_encoder.encode_para(para=para_list, title=title_list)
-    for p in p_embs:
-        print (' '.join(str(ii) for ii in p), file = sys.stderr)
-    ips = dual_encoder.matching(query=query_list, para=para_list, title=title_list)
-    #for ip in ips:
-    #    print (ip)
-    """
-
-    cross_encoder = load_model(ce_conf)
-    ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
-    for rs in ranking_score:
-        print (rs)
-
+    pass

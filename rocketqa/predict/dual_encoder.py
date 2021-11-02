@@ -42,7 +42,10 @@ from rocketqa.utils.finetune_args import parser
 class DualEncoder(object):
 
     def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, **kwargs):
-        args = self._parse_args(conf_path)
+        if "model_path" in kwargs:
+            args = self._parse_args(conf_path, model_path=kwargs["model_path"])
+        else:
+            args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
         ernie_config = ErnieConfig(args.ernie_config_path)
         ernie_config.print_config()
@@ -94,7 +97,7 @@ class DualEncoder(object):
             args.init_checkpoint,
             main_program=startup_prog)
 
-    def _parse_args(self, conf_path):
+    def _parse_args(self, conf_path, model_path=''):
         args = parser.parse_args()
         try:
             with open(conf_path, 'r', encoding='utf8') as json_file:
@@ -108,9 +111,9 @@ class DualEncoder(object):
         args.use_fast_executor = True
         args.q_max_seq_len = config_dict['q_max_seq_len']
         args.p_max_seq_len = config_dict['p_max_seq_len']
-        args.ernie_config_path = config_dict['model_conf_path']
-        args.vocab_path = config_dict['model_vocab_path']
-        args.init_checkpoint = config_dict['model_checkpoint_path']
+        args.ernie_config_path = model_path + config_dict['model_conf_path']
+        args.vocab_path = model_path + config_dict['model_vocab_path']
+        args.init_checkpoint = model_path + config_dict['model_checkpoint_path']
         if 'model_name' in config_dict:
             args.model_name = config_dict['model_name']
         else:
