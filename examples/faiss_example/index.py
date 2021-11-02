@@ -26,7 +26,7 @@ if __name__ == '__main__':
         "model_name": "v1_marco_de",
         "conf_path": "",
         "use_cuda": True,
-        "gpu_card_id": 4,
+        "gpu_card_id": 0,
         "batch_size": 32
     }
 
