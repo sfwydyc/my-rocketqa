@@ -12,17 +12,17 @@ paddle.enable_static()
 
 
 __MODELS = {
-        "v1_marco_de": "http://10.216.184.161:8077/rocketqa_models/v1_marco_de.tar.gz",
-        "v1_marco_ce": "http://10.216.184.161:8077/rocketqa_models/v1_marco_ce.tar.gz",
-        "v1_nq_de": "http://10.216.184.161:8077/rocketqa_models/v1_nq_de.tar.gz",
-        "v1_nq_ce": "http://10.216.184.161:8077/rocketqa_models/v1_nq_ce.tar.gz",
-        "pair_marco_de": "http://10.216.184.161:8077/rocketqa_models/pair_marco_de.tar.gz",
-        "pair_nq_de": "http://10.216.184.161:8077/rocketqa_models/pair_marco_ce.tar.gz",
-        "v2_marco_de": "http://10.216.184.161:8077/rocketqa_models/v2_marco_de.tar.gz",
-        "v2_marco_ce": "http://10.216.184.161:8077/rocketqa_models/v2_marco_ce.tar.gz",
-        "v2_nq_de": "http://10.216.184.161:8077/rocketqa_models/v2_nq_de.tar.gz",
-        "zh_dureader_de": "http://10.216.184.161:8077/rocketqa_models/zh_dureader_de.tar.gz",
-        "zh_dureader_ce": "http://10.216.184.161:8077/rocketqa_models/zh_dureader_ce.tar.gz"
+        "v1_marco_de": "",
+        "v1_marco_ce": "",
+        "v1_nq_de": "",
+        "v1_nq_ce": "",
+        "pair_marco_de": "",
+        "pair_nq_de": "",
+        "v2_marco_de": "",
+        "v2_marco_ce": "",
+        "v2_nq_de": "",
+        "zh_dureader_de": "",
+        "zh_dureader_ce": ""
 }
 
 
