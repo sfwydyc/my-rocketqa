@@ -2,7 +2,6 @@ import os
 import faiss
 import logging
 import rocketqa
-from rocketqa import rocketqa
 
 log = logging.getLogger(__name__)
 

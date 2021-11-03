@@ -5,7 +5,6 @@ import faiss
 from tornado import web
 from tornado import ioloop
 import rocketqa
-from rocketqa import rocketqa
 
 class FaissTool():
     """

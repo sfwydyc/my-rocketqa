@@ -24,15 +24,10 @@ RocketQA focus on improving the dense contexts retrieval stage, and propose the 
 
 ## Installation
 
-First, install [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) as well as additional dependencies:
-```bash
-$ pip install paddlepaddle-gpu
-```
-Then, install RocketQA package:
 ```bash
 $ pip install rocketqa
 ```
-NOTE: RocketQA package MUST be running on Python3.6+ with PaddlePaddle 2.1+.
+NOTE: RocketQA package MUST be running on Python3.6+ with [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) 2.0+ :
 
 ## API
 The RocketQA module rocketqa provides the following methods:
@@ -72,7 +67,6 @@ With the code below, you can run RocketQA models or your own checkpoints. To run
 
 ```python
 import rocketqa
-from rocketqa import rocketqa
 
 de_conf = {
     "model_name": "zh_dureader_de",  
@@ -101,7 +95,6 @@ inner_products = dual_encoder.matching(query=query_list, para=para_list, title=t
 
 ```python
 import rocketqa
-from rocketqa import rocketqa
 
 # conf
 ce_conf = {

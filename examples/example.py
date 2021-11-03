@@ -1,7 +1,6 @@
 import os
 import sys
 import rocketqa
-from rocketqa import rocketqa
 
 de_conf = {
     "model_name": "zh_dureader_de",
