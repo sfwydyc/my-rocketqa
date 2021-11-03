@@ -41,7 +41,7 @@ from rocketqa.utils.finetune_args import parser
 
 class DualEncoder(object):
 
-    def __init__(self, conf_path, use_cuda, gpu_card_id, batch_size, **kwargs):
+    def __init__(self, conf_path, use_cuda=False, gpu_card_id=0, batch_size=1, **kwargs):
         if "model_path" in kwargs:
             args = self._parse_args(conf_path, model_path=kwargs["model_path"])
         else:
