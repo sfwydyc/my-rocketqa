@@ -1,8 +1,10 @@
 import os
 import sys
 import paddle
-import itertools
+import urllib
 import numpy as np
+import tarfile
+from tqdm import tqdm
 from rocketqa.predict.dual_encoder import DualEncoder
 from rocketqa.predict.cross_encoder import CrossEncoder
 
@@ -10,17 +12,17 @@ paddle.enable_static()
 
 
 __MODELS = {
-    "v1_marco_de": "-",
-    "v1_marco_ce": "-",
-    "v1_nq_de": "-",
-    "v1_nq_ce": "-",
-    "pair_marco_de": "-",
-    "pair_nq_de": "-",
-    "v2_marco_de": "-",
-    "v2_marco_ce": "-",
-    "v2_nq": "-",
-    "zh_dureader_de": "-",
-    "zh_dureader_ce": "-"
+        "v1_marco_de": "http://10.216.184.161:8077/rocketqa_models/v1_marco_de.tar.gz",
+        "v1_marco_ce": "http://10.216.184.161:8077/rocketqa_models/v1_marco_ce.tar.gz",
+        "v1_nq_de": "http://10.216.184.161:8077/rocketqa_models/v1_nq_de.tar.gz",
+        "v1_nq_ce": "http://10.216.184.161:8077/rocketqa_models/v1_nq_ce.tar.gz",
+        "pair_marco_de": "http://10.216.184.161:8077/rocketqa_models/pair_marco_de.tar.gz",
+        "pair_nq_de": "http://10.216.184.161:8077/rocketqa_models/pair_marco_ce.tar.gz",
+        "v2_marco_de": "http://10.216.184.161:8077/rocketqa_models/v2_marco_de.tar.gz",
+        "v2_marco_ce": "http://10.216.184.161:8077/rocketqa_models/v2_marco_ce.tar.gz",
+        "v2_nq_de": "http://10.216.184.161:8077/rocketqa_models/v2_nq_de.tar.gz",
+        "zh_dureader_de": "http://10.216.184.161:8077/rocketqa_models/zh_dureader_de.tar.gz",
+        "zh_dureader_ce": "http://10.216.184.161:8077/rocketqa_models/zh_dureader_ce.tar.gz"
 }
 
 
@@ -75,7 +77,30 @@ def load_model(encoder_conf):
 
 
 def __download(model_name):
-    pass
+    os.makedirs(os.path.expanduser('~/.rocketqa/'), exist_ok=True)
+    filename = model_name + '.tar.gz'
+    download_dst = os.path.join(os.path.expanduser('~/.rocketqa/') + filename)
+    download_url = __MODELS[model_name]
+    print (download_url)
+
+    if not os.path.exists(download_dst):
+        with urllib.request.urlopen(download_url) as source, open(download_dst, "wb") as output:
+            with tqdm(total=int(source.info().get("Content-Length")), ncols=80, unit='iB', unit_scale=True, unit_divisor=1024) as loop:
+                while True:
+                    buffer = source.read(8192)
+                    if not buffer:
+                        break
+
+                    output.write(buffer)
+                    loop.update(len(buffer))
+
+    try:
+        t = tarfile.open(download_dst)
+        t.extractall(os.path.expanduser('~/.rocketqa/'))
+    except Exception as e:
+        print(e)
+
+
 
 if __name__ == '__main__':
     pass

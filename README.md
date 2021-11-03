@@ -65,17 +65,18 @@ Given a list of queries and passages (titles), returns their matching scores.
 
 ## Examples
 
-### Official model Prediction
+### Run Prediction
+With the code below, you can run RocketQA models or your own checkpoints. To run RocketQA models, xxx . To run your own checkpoints, xxxxxx .
 
-#### dual encoder
+####  Run RocketQA Model
 
 ```python
 import rocketqa
 from rocketqa import rocketqa
 
 de_conf = {
-    "model_name": "zh_dureader_de",
-    "conf_path": "/mnt/dqa/dingyuchen/irqa_jina/checkpoints/rocketqa_v2/marco/marco_de_config.json",
+    "model_name": "zh_dureader_de",  
+    "conf_path": "",
     "use_cuda": True,
     "gpu_card_id": 0,
     "batch_size": 16
@@ -96,7 +97,7 @@ inner_products = dual_encoder.matching(query=query_list, para=para_list, title=t
 ```
 
 
-#### cross encoder
+#### Run Self-development Model
 
 ```python
 import rocketqa
@@ -104,8 +105,8 @@ from rocketqa import rocketqa
 
 # conf
 ce_conf = {
-    "model_name": "zh_dureader_ce",
-    "conf_path": "/mnt/dqa/dingyuchen/irqa_jina/checkpoints/rocketqa_v2/marco/marco_ce_config.json",
+    "model_name": "",
+    "conf_path": "path of your own config file",
     "use_cuda": True,
     "gpu_card_id": 0,
     "batch_size": 16
@@ -122,9 +123,30 @@ cross_encoder = rocketqa.load_model(ce_conf)
 ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
 ```
 
+The config file is JSON format file.
+
+```bash
+{
+    "model_type": "cross_encoder",
+    "max_seq_len": 160,
+    "model_conf_path": "en_large_config.json",
+    "model_vocab_path": "en_vocab.txt",
+    "model_checkpoint_path": "marco_cross_encoder_large",
+    "joint_training": 0
+}
+```
 
 
-### Start your QA-System
+## Start your QA-System
+
+With the examples blow, you can build your own QA-System
+
+### Running with JINA
+
+
+
+
+### Running with Faiss
 
 ```bash
 cd examples/faiss_example/
@@ -140,5 +162,4 @@ python3 query.py
 ```
 
 
-### Running with JINA
 
