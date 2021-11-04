@@ -4,12 +4,13 @@ import paddle
 import urllib
 import numpy as np
 import tarfile
+import warnings
 from tqdm import tqdm
 from rocketqa.predict.dual_encoder import DualEncoder
 from rocketqa.predict.cross_encoder import CrossEncoder
 
 paddle.enable_static()
-
+warnings.simplefilter('ignore')
 
 __MODELS = {
         "v1_marco_de": "",
@@ -39,7 +40,7 @@ def load_model(encoder_conf):
 
     if "model_name" in encoder_conf:
         model_name = encoder_conf['model_name']
-        print (model_name)
+        #print (model_name)
         if model_name in __MODELS:
             official_model = True
             model_path = os.path.expanduser('~/.rocketqa/') + model_name + '/'

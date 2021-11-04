@@ -45,7 +45,7 @@ class CrossEncoderInfer(object):
         args.use_cuda = use_cuda
         self.batch_size = batch_size
         ernie_config = ErnieConfig(args.ernie_config_path)
-        ernie_config.print_config()
+        #ernie_config.print_config()
 
         if use_cuda:
             dev_list = fluid.cuda_places()

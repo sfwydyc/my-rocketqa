@@ -45,7 +45,7 @@ class DualEncoderInfer(object):
         args = self._parse_args(conf_path)
         args.use_cuda = use_cuda
         ernie_config = ErnieConfig(args.ernie_config_path)
-        ernie_config.print_config()
+        #ernie_config.print_config()
         self.batch_size = batch_size
         self.cls_type = cls_type
 
@@ -114,7 +114,6 @@ class DualEncoderInfer(object):
 
         reps = []
         for sample in predict_data_generator():
-            print (len(sample[0]))
             src_ids_data_q = sample[0]
             sent_ids_data_q = sample[1]
             pos_ids_data_q = sample[2]
