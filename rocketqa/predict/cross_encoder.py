@@ -41,7 +41,7 @@ from rocketqa.utils.finetune_args import parser
 
 
 class CrossEncoder(object):
-    def __init__(self, conf_path, use_cuda=False, gpu_card_id=0, batch_size=1, **kwargs):
+    def __init__(self, conf_path, use_cuda=False, device_id=0, batch_size=1, **kwargs):
         if "model_path" in kwargs:
             args = self._parse_args(conf_path, model_path=kwargs["model_path"])
         else:
@@ -53,7 +53,7 @@ class CrossEncoder(object):
 
         if use_cuda:
             dev_list = fluid.cuda_places()
-            place = dev_list[gpu_card_id]
+            place = dev_list[device_id]
             dev_count = len(dev_list)
         else:
             place = fluid.CPUPlace()
@@ -101,12 +101,9 @@ class CrossEncoder(object):
 
 
     def _parse_args(self, conf_path, model_path=''):
-        args = parser.parse_args()
-        try:
-            with open(conf_path, 'r', encoding='utf8') as json_file:
-                config_dict = json.load(json_file)
-        except Exception:
-            raise IOError("Error in parsing model config file '%s'" %conf_path)
+        args, unknown = parser.parse_known_args()
+        with open(conf_path, 'r', encoding='utf8') as json_file:
+            config_dict = json.load(json_file)
 
         args.do_train = False
         args.do_val = False
@@ -131,8 +128,8 @@ class CrossEncoder(object):
 
     def matching(self, query, para, title=[]):
 
-        data = []
         assert len(para) == len(query)
+        data = []
         if len(title) != 0:
             assert len(para) == len(title)
             for q, t, p in zip(query, title, para):

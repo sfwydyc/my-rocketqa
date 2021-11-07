@@ -104,17 +104,6 @@ def create_model(args,
                     initializer=fluid.initializer.Constant(0.)))
             probs = fluid.layers.softmax(logits)
 
-        """
-        if is_prediction:
-            probs = fluid.layers.softmax(logits)
-            feed_targets_name = [
-                src_ids.name, sent_ids.name, pos_ids.name, input_mask.name
-            ]
-            if ernie_version == "2.0":
-                feed_targets_name += [task_ids.name]
-            return pyreader, probs, feed_targets_name
-        """
-
         graph_vars = {
             "probs": probs,
         }
@@ -125,7 +114,6 @@ def create_model(args,
         graph_vars = _model(is_noise=True)
         old_loss = graph_vars["loss"]
         token_emb = fluid.default_main_program().global_block().var("word_embedding")
-        # print(token_emb)
         token_emb.stop_gradient = False
         token_gradient = fluid.gradients(old_loss, token_emb)[0]
         token_gradient.stop_gradient = False
@@ -141,5 +129,4 @@ def create_model(args,
         graph_vars = _model()
 
     return pyreader, graph_vars
-
 

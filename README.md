@@ -69,10 +69,9 @@ With the code below, you can run RocketQA models or your own checkpoints. To run
 import rocketqa
 
 de_conf = {
-    "model_name": "zh_dureader_de",  
-    "conf_path": "",
+    "model": "zh_dureader_de",  
     "use_cuda": True,
-    "gpu_card_id": 0,
+    "device_id": 0,
     "batch_size": 16
 }
 
@@ -81,7 +80,7 @@ para_list = ["Paula Deen & Brother Bubba Sued for Harassment"]
 title_list = ["Paula Deen and her brother Earl W. Bubba Hiers are being sued by a former general manager at Uncle Bubba'sâ<80>¦ Paula Deen and her brother Earl W. Bubba Hiers are being sued by a former general manager at Uncle Bubba'sâ"]
 
 # init dual encoder
-dual_encoder = rocketqa.load_model(de_conf)
+dual_encoder = rocketqa.load_model(**de_conf)
 
 # encode query & para
 q_embs = dual_encoder.encode_query(query=query_list)
@@ -98,10 +97,9 @@ import rocketqa
 
 # conf
 ce_conf = {
-    "model_name": "",
-    "conf_path": "path of your own config file",
+    "model": "path of your own config file",
     "use_cuda": True,
-    "gpu_card_id": 0,
+    "device_id": 0,
     "batch_size": 16
 }
 
@@ -110,7 +108,7 @@ para_list = ["Paula Deen & Brother Bubba Sued for Harassment"]
 title_list = ["Paula Deen and her brother Earl W. Bubba Hiers are being sued by a former general manager at Uncle Bubba'sâ<80>¦ Paula Deen and her brother Earl W. Bubba Hiers are being sued by a former general manager at Uncle Bubba'sâ"]
 # init cross encoder
 
-cross_encoder = rocketqa.load_model(ce_conf)
+cross_encoder = rocketqa.load_model(**ce_conf)
 
 # compute matching score of query and para
 ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
@@ -145,10 +143,10 @@ With the examples blow, you can build your own QA-System
 cd examples/faiss_example/
 
 # Index
-python3 index.py
+python3 index.py ${data_file} ${index_file}
 
 # Start service
-python3 rocketqa_service.py
+python3 rocketqa_service.py ${data_file} ${index_file}
 
 # request
 python3 query.py

@@ -41,7 +41,7 @@ from rocketqa.utils.finetune_args import parser
 
 class DualEncoder(object):
 
-    def __init__(self, conf_path, use_cuda=False, gpu_card_id=0, batch_size=1, **kwargs):
+    def __init__(self, conf_path, use_cuda=False, device_id=0, batch_size=1, **kwargs):
         if "model_path" in kwargs:
             args = self._parse_args(conf_path, model_path=kwargs["model_path"])
         else:
@@ -53,7 +53,7 @@ class DualEncoder(object):
 
         if args.use_cuda:
             dev_list = fluid.cuda_places()
-            place = dev_list[gpu_card_id]
+            place = dev_list[device_id]
             dev_count = len(dev_list)
         else:
             place = fluid.CPUPlace()
@@ -98,12 +98,9 @@ class DualEncoder(object):
             main_program=startup_prog)
 
     def _parse_args(self, conf_path, model_path=''):
-        args = parser.parse_args()
-        try:
-            with open(conf_path, 'r', encoding='utf8') as json_file:
-                config_dict = json.load(json_file)
-        except Exception:
-            raise IOError("Error in parsing model config file '%s'" %conf_path)
+        args, unknown = parser.parse_known_args()
+        with open(conf_path, 'r', encoding='utf8') as json_file:
+            config_dict = json.load(json_file)
 
         args.do_train = False
         args.do_val = False
@@ -158,7 +155,7 @@ class DualEncoder(object):
 
         data = []
         if len(title) != 0:
-            assert len(para) == len(title)
+            assert (len(para) == len(title)), "The input para(List) and title(List) should be the same length"
             for t, p in zip(title, para):
                 data.append('-\t' + t + '\t' + p)
         else:
@@ -190,9 +187,9 @@ class DualEncoder(object):
     def matching(self, query, para, title=[]):
 
         data = []
-        assert len(para) == len(query)
+        assert (len(para) == len(query)), "The input query(List) and para(List) should be the same length"
         if len(title) != 0:
-            assert len(para) == len(title)
+            assert (len(para) == len(title)), "The input query(List) and para(List) should be the same length"
             for q, t, p in zip(query, title, para):
                 data.append(q + '\t' + t + '\t' + p)
         else:
@@ -218,6 +215,5 @@ class DualEncoder(object):
                 self.test_pyreader.reset()
                 break
 
-        #return np.concatenate(embs)[:len(data)]
         return inner_probs
 

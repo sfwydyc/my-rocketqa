@@ -33,12 +33,6 @@ from rocketqa.utils.batching import pad_batch_data
 
 log = logging.getLogger(__name__)
 
-if six.PY3:
-    import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
-
 def csv_reader(fd, delimiter='\t'):
     def gen():
         for i in fd:
@@ -124,15 +118,15 @@ class BaseReader(object):
         tokens_query = tokenizer.tokenize(query)
         self._truncate_seq_pair([], tokens_query, q_max_seq_length - 2)
 
-        # title
         title = tokenization.convert_to_unicode(example.title)
         tokens_title = tokenizer.tokenize(title)
-        # para
+
         para = tokenization.convert_to_unicode(example.para)
         tokens_para = tokenizer.tokenize(para)
 
         self._truncate_seq_pair(tokens_title, tokens_para, p_max_seq_length - 3)
 
+        ### query
         tokens_q = []
         text_type_ids_q = []
         tokens_q.append("[CLS]")
@@ -145,13 +139,8 @@ class BaseReader(object):
 
         token_ids_q = tokenizer.convert_tokens_to_ids(tokens_q)
         position_ids_q = list(range(len(token_ids_q)))
-        #f = open('tid', 'a')
-        #for tid in range(len(token_ids_q)):
-        #    f.write(str(token_ids_q[tid]) + '\t' + tokens_q[tid] + '\n')
-            #f.write(str(token_ids_q[tid]) + ' ')
-        #f.write('\t')
 
-        ### para
+        ### title-para
         tokens_p = []
         text_type_ids_p = []
         tokens_p.append("[CLS]")
@@ -171,11 +160,6 @@ class BaseReader(object):
 
         token_ids_p = tokenizer.convert_tokens_to_ids(tokens_p)
         position_ids_p = list(range(len(token_ids_p)))
-        #for tid in range(len(token_ids_p)):
-        #    f.write(str(token_ids_p[tid]) + '\t' + tokens_p[tid] + '\n')
-            #f.write(str(token_ids_p[tid]) + ' ')
-        #f.write('\n')
-        #f.close()
 
         if self.is_inference:
             Record = namedtuple('Record',
@@ -285,10 +269,6 @@ class BaseReader(object):
 
 class DEPredictorReader(BaseReader):
     def _read_samples(self, batch_samples, quotechar=None):
-        """
-            Read sample list
-            samples: [[query, title, para] ...]
-        """
         headers = 'query\ttitle\tpara\tlabel'.split('\t')
         Example = namedtuple('Example', headers)
 
@@ -386,6 +366,3 @@ class DEPredictorReader(BaseReader):
 
         return return_list
 
-
-if __name__ == '__main__':
-    pass

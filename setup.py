@@ -22,13 +22,13 @@ with open("requirements.txt") as fin:
 
 setuptools.setup(
     name="rocketqa",
-    version="0.0.1",
+    version="1.0.0",
     author="dingyuchen",
     author_email="dingyuchen@baidu.com",
     description=long_description,
     long_description=long_description,
     long_description_content_type="text/plain",
-    url="https://github.com/sfwydyc/rocketqa",
+    url="https://github.com/PaddlePaddle/RocketQA",
     packages=setuptools.find_packages(
         where='.', exclude=('checkpoints*', 'research*', 'data*', 'inference_model*', 'examples*', 'dureader*')),
     setup_requires=['cython', 'numpy'],
