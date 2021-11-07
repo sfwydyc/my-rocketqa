@@ -14,5 +14,5 @@
 
 __version__ = '1.0.0'
 
-from rocketqa.rocketqa import load_model
-from rocketqa.rocketqa import available_models
+from .rocketqa import load_model
+from .rocketqa import available_models

@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import paddle
 import urllib
 import numpy as np
@@ -28,46 +29,71 @@ __MODELS = {
 
 
 def available_models():
+    """
+    Return the names of available RocketQA models
+    """
     return __MODELS.keys()
 
 
-def load_model(encoder_conf):
+def load_model(model, use_cuda=False, device_id=0, batch_size=1):
+    """
+    Load a RocketQA model or an user-specified checkpoint
+    Args:
+        model: A model name return by `rocketqa.availabel_models()` or the path of an user-specified checkpoint config
+        use_cuda: Whether to use GPU
+        devicd_id: The device to put the model
+        batch_size: Batch_size during inference
+    Returns:
+        model
+    """
 
     model_type = ''
     model_name = ''
-    official_model = False
-    encoder = None
+    rocketqa_model = False
+    encoder_conf = {}
 
-    if "model_name" in encoder_conf:
-        model_name = encoder_conf['model_name']
-        #print (model_name)
-        if model_name in __MODELS:
-            official_model = True
-            model_path = os.path.expanduser('~/.rocketqa/') + model_name + '/'
-            if not os.path.exists(model_path):
-                __download(model_name)
-            encoder_conf['conf_path'] = model_path + 'config.json'
-            encoder_conf['model_path'] = model_path
-            if model_name.find("_de") >= 0:
-                model_type = 'dual_encoder'
-            elif model_name.find("_ce") >= 0:
-                model_type = 'cross_encoder'
-        else:
-            print ("not official model")
+    if model in __MODELS:
+        model_name = model
+        print ("RocketQA model [{}]".format(model_name), file=sys.stderr)
+        rocketqa_model = True
+        model_path = os.path.expanduser('~/.rocketqa/') + model_name + '/'
+        if not os.path.exists(model_path):
+            if __download(model_name) is False:
+                raise Exception("RocketQA model [{}] not found".format(model_name))
 
-    if official_model is False:
-        assert ("conf_path" in encoder_conf), "[conf_path] not found in config file"
-        conf_path = encoder_conf['conf_path']
-        assert (os.path.isfile(conf_path)), "[%s] not exists" %(conf_path)
+        encoder_conf['conf_path'] = model_path + 'config.json'
+        encoder_conf['model_path'] = model_path
+        if model_name.find("_de") >= 0:
+            model_type = 'dual_encoder'
+        elif model_name.find("_ce") >= 0:
+            model_type = 'cross_encoder'
+
+    if rocketqa_model is False:
+        print ("User-specified model", file=sys.stderr)
+        conf_path = model
+        if not os.path.isfile(conf_path):
+            raise Exception("Config file [{}] not found".format(conf_path))
         try:
             with open(conf_path, 'r', encoding='utf8') as json_file:
                 config_dict = json.load(json_file)
-        except Exception:
-            raise IOError("Error in parsing model config file '%s'" %conf_path)
+        except Exception as e:
+            raise Exception(str(e) + "\nConfig file [{}] load failed".format(conf_path))
 
-        assert ("model_type" in config_dict), "[model_type] not found in config file"
+        encoder_conf['conf_path'] = conf_path
+
+        split_p = conf_path.rfind('/')
+        if split_p > 0:
+            encoder_conf['model_path'] = conf_path[0:split_p + 1]
+
+        if "model_type" not in config_dict:
+            raise Exception("[model_type] not found in config file")
         model_type = config_dict["model_type"]
-        assert (model_type == "dual_encoder" or model_type == "cross_encoder"), "model_type [%s] is illegal" % (m_type)
+        if model_type != "dual_encoder" and model_type != "cross_encoder":
+            raise Exception("model_type [model_type] is illegal, must be `dual_encoder` or `cross_encoder`")
+
+    encoder_conf["use_cuda"] = use_cuda
+    encoder_conf["device_id"] = device_id
+    encoder_conf["batch_size"] = batch_size
 
     if model_type[0] == "d":
         encoder = DualEncoder(**encoder_conf)
@@ -82,9 +108,11 @@ def __download(model_name):
     filename = model_name + '.tar.gz'
     download_dst = os.path.join(os.path.expanduser('~/.rocketqa/') + filename)
     download_url = __MODELS[model_name]
-    print (download_url)
 
-    if not os.path.exists(download_dst):
+    if os.path.exists(download_dst):
+        print ("RocketQA model [{}] exists".format(model_name), file=sys.stderr)
+    else:
+        print ("Download RocketQA model [{}]".format(model_name), file=sys.stderr)
         with urllib.request.urlopen(download_url) as source, open(download_dst, "wb") as output:
             with tqdm(total=int(source.info().get("Content-Length")), ncols=80, unit='iB', unit_scale=True, unit_divisor=1024) as loop:
                 while True:
@@ -95,12 +123,15 @@ def __download(model_name):
                     output.write(buffer)
                     loop.update(len(buffer))
 
+
     try:
         t = tarfile.open(download_dst)
         t.extractall(os.path.expanduser('~/.rocketqa/'))
     except Exception as e:
-        print(e)
+        print (str(e), file=sys.stderr)
+        return False
 
+    return True
 
 
 if __name__ == '__main__':

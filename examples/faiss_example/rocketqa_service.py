@@ -20,7 +20,6 @@ class FaissTool():
         res_dist, res_pid = self.engine.search(q_embs, topk)
         result_list = []
         for i in range(topk):
-            #print (str(dist[i]) + '\t' + str(pid[i]) + '\t' + self.id2text[pid[i]])
             result_list.append(self.id2text[res_pid[0][i]])
         return result_list
 
@@ -102,32 +101,26 @@ class RocketQAServer(web.RequestHandler):
         self.write(result_str)
 
 
-
-def create_rocketqa_app(sub_address, rocketqa_server):
+def create_rocketqa_app(sub_address, rocketqa_server, data_file, index_file):
     """
     Create RocketQA server application
     """
     de_conf = {
-        "model_name": "v1_marco_de",
-        "conf_path": "",
+        "model": "v1_marco_de",
         "use_cuda": True,
-        "gpu_card_id": 0,
+        "device_id": 0,
         "batch_size": 32
     }
     ce_conf = {
-        "model_name": "v1_marco_ce",
-        "conf_path": "",
+        "model": "v1_marco_ce",
         "use_cuda": True,
-        "gpu_card_id": 0,
+        "device_id": 0,
         "batch_size": 32
     }
-    dual_encoder = rocketqa.load_model(de_conf)
-    cross_encoder = rocketqa.load_model(ce_conf)
+    dual_encoder = rocketqa.load_model(**de_conf)
+    cross_encoder = rocketqa.load_model(**ce_conf)
 
-
-    text_filename = 'marco.tp.1k'
-    index_filename = 'marco_test.index'
-    faiss_tool = FaissTool(text_filename, index_filename)
+    faiss_tool = FaissTool(data_file, index_file)
     print ('load index done')
 
     return web.Application([(sub_address, rocketqa_server, \
@@ -138,8 +131,17 @@ def create_rocketqa_app(sub_address, rocketqa_server):
 
 if __name__ == "__main__":
 
+    if len(sys.argv) != 3:
+        print ("USAGE: ")
+        print ("      python3 rocketqa_service.py ${data_file} ${index_file}")
+        print ("    --For Example:")
+        print ("      python3 rocketqa_service.py ../marco.tp.1k marco_test.index")
+        exit()
+
+    data_file = sys.argv[1]
+    index_file = sys.argv[2]
     sub_address = r'/rocketqa'
     port = '8888'
-    app = create_rocketqa_app(sub_address, RocketQAServer)
+    app = create_rocketqa_app(sub_address, RocketQAServer, data_file, index_file)
     app.listen(port)
     ioloop.IOLoop.current().start()

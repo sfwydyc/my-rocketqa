@@ -1,14 +1,12 @@
 import os
+import sys
 import faiss
-import logging
 import rocketqa
-
-log = logging.getLogger(__name__)
 
 
 def build_index(encoder_conf, index_file_name, title_list, para_list):
 
-    dual_encoder = rocketqa.load_model(encoder_conf)
+    dual_encoder = rocketqa.load_model(**encoder_conf)
     para_embs = dual_encoder.encode_para(para=para_list, title=title_list)
 
     indexer = faiss.IndexFlatIP(768)
@@ -21,21 +19,26 @@ def build_index(encoder_conf, index_file_name, title_list, para_list):
 
 
 if __name__ == '__main__':
-    de_conf = {
-        "model_name": "v1_marco_de",
-        "conf_path": "",
-        "use_cuda": True,
-        "gpu_card_id": 0,
-        "batch_size": 32
-    }
+    if len(sys.argv) != 3:
+        print ("USAGE: ")
+        print ("      python3 index.py ${data_file} ${index_file}")
+        print ("    --For Example:")
+        print ("      python3 index.py ../marco.tp.1k marco_test.index")
+        exit()
 
-    marco_data = 'marco.tp.1k'
-    dureader_data = 'durd_test.top50.top1k'
+    data_file = sys.argv[1]
+    index_file = sys.argv[2]
     para_list = []
     title_list = []
-    for line in open(marco_data):
+    for line in open(data_file):
         t, p = line.strip().split('\t')
         para_list.append(p)
         title_list.append(t)
 
-    build_index(de_conf, 'marco_test.index', title_list, para_list)
+    de_conf = {
+            "model":"v1_marco_de",
+            "use_cuda":True,
+            "device_id":0,
+            "batch_size": 32
+    }
+    build_index(de_conf, index_file, title_list, para_list)

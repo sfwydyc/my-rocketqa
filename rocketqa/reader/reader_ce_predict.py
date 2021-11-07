@@ -32,12 +32,6 @@ from rocketqa.utils.batching import pad_batch_data
 
 log = logging.getLogger(__name__)
 
-#if six.PY3:
-#    import io
-#    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-#    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
-
 def csv_reader(fd, delimiter='\t', trainer_id=0, trainer_num=1):
     def gen():
         for i, line in enumerate(fd):
@@ -156,6 +150,7 @@ class BaseReader(object):
         # For classification tasks, the first vector (corresponding to [CLS]) is
         # used as as the "sentence vector". Note that this only makes sense because
         # the entire model is fine-tuned.
+
         tokens = []
         text_type_ids = []
         tokens.append("[CLS]")
@@ -228,8 +223,6 @@ class BaseReader(object):
             yield self._pad_batch_records(batch_records)
 
     def get_num_examples(self, input_file):
-#        examples = self._read_tsv(input_file)
-#        return len(examples)
         return self.num_examples
 
     def data_generator(self,
@@ -239,10 +232,10 @@ class BaseReader(object):
                        phase=None):
 
         if phase == 'train':
-#            examples = examples[trainer_id: (len(examples) //trainer_num) * trainer_num : trainer_num]
             self.num_examples_per_node = self.total_num // trainer_num
             self.num_examples = self.num_examples_per_node * trainer_num
-            examples = self._read_tsv(input_file, trainer_id=trainer_id, trainer_num=trainer_num, num_examples=self.num_examples_per_node)
+            examples = self._read_tsv(input_file, trainer_id=trainer_id, \
+                                      trainer_num=trainer_num, num_examples=self.num_examples_per_node)
             log.info('apply sharding %d/%d' % (trainer_id, trainer_num))
         else:
             examples = self._read_tsv(input_file)
@@ -306,7 +299,6 @@ class CEPredictorReader(BaseReader):
         return f
 
     def _read_samples(self, batch_samples):
-        """Reads a tab separated line."""
         headers = 'query\ttitle\tpara\tlabel'.split('\t')
         text_indices = [
             index for index, h in enumerate(headers) if h != "label"
