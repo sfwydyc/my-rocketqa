@@ -1,4 +1,4 @@
-# RocketQA Dense Retrieval Tool
+# RocketQA End-to-End QA-system Development Tool
 
 This repository provides a simple and efficient toolkit for running RocketQA models and build a QA-system. 
 
@@ -34,12 +34,12 @@ The RocketQA module rocketqa provides the following methods:
 
 #### `rocketqa.available_models()`
 
-Returns the names of the available models
+Returns the names of the available RocketQA models.
 
-#### `rocketqa.load_model(encoder_config)`
+#### `rocketqa.load_model(model, use_cuda=False, device_id=0, batch_size=1)`
 
-Returns the model specifiecd by input encoder_config. 
-With encoder config, developers can choose the RocketQA models returned by available_models(), or their own training checkpoints.
+Returns the model specifiecd by input parameter. 
+With parameter, developers can choose the RocketQA models returned by available_models(), or their own training checkpoints.
 
 ---
 

@@ -1,2 +1,1 @@
-paddlepaddle-gpu
 tqdm

@@ -14,17 +14,17 @@ paddle.enable_static()
 warnings.simplefilter('ignore')
 
 __MODELS = {
-        "v1_marco_de": "",
-        "v1_marco_ce": "",
-        "v1_nq_de": "",
-        "v1_nq_ce": "",
-        "pair_marco_de": "",
-        "pair_nq_de": "",
-        "v2_marco_de": "",
-        "v2_marco_ce": "",
-        "v2_nq_de": "",
-        "zh_dureader_de": "",
-        "zh_dureader_ce": ""
+        "v1_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_marco_de.tar.gz",
+        "v1_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_marco_ce.tar.gz",
+        "v1_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_de.tar.gz",
+        "v1_nq_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_ce.tar.gz",
+        "pair_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_marco_de.tar.gz",
+        "pair_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_marco_ce.tar.gz",
+        "v2_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_de.tar.gz",
+        "v2_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_ce.tar.gz",
+        "v2_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_nq_de.tar.gz",
+        "zh_dureader_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_de.tar.gz",
+        "zh_dureader_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_ce.tar.gz"
 }
 
 
