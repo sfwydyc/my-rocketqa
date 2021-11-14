@@ -23,13 +23,14 @@ RocketQA focus on improving the dense contexts retrieval stage, and propose the 
 
 
 ## Installation
+
+### Install python package
 First, install [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html).
-GPU version:
 ```bash
+# GPU version:
 $ pip install paddlepaddle-gpu
-```
-CPU version:
-```bash
+
+# CPU version:
 $ pip install paddlepaddle
 ```
 
@@ -40,8 +41,16 @@ $ pip install rocketqa
 
 NOTE: RocketQA package MUST be running on Python3.6+ with [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) 2.0+ :
 
+### Download Docker environment
+
+```bash
+docker pull rocketqa_docker_name
+
+docker run -it rocketqa_docker_name
+```
+
 ## API
-The RocketQA development tool provides two kind of models, one is an ERNIE-based twin towers dual-encoder for answer retrieval, anthor is an ERNIE-based cross encoder for answer reranking. And development tool provides the following methods:
+The RocketQA development tool provides two kind of models, one is ERNIE-based twin towers dual-encoder for answer retrieval, anthor is ERNIE-based cross encoder for answer reranking. And development tool provides the following methods:
 
 #### `rocketqa.available_models()`
 
@@ -130,9 +139,9 @@ The config file is JSON format file.
 {
     "model_type": "cross_encoder",
     "max_seq_len": 160,
-    "model_conf_path": "en_large_config.json",
-    "model_vocab_path": "en_vocab.txt",
-    "model_checkpoint_path": "marco_cross_encoder_large",
+    "model_conf_path": "en_large_config.json",  # path relative to config file
+    "model_vocab_path": "en_vocab.txt",         # path relative to config file
+    "model_checkpoint_path": "marco_cross_encoder_large", # path relative to config file
     "joint_training": 0
 }
 ```
