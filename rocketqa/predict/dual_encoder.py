@@ -46,9 +46,13 @@ class DualEncoder(object):
             args = self._parse_args(conf_path, model_path=kwargs["model_path"])
         else:
             args = self._parse_args(conf_path)
+        if "model_name" in kwargs:
+            args.model_name = kwargs["model_name"].replace('/', '-')
+        else:
+            args.model_name = "my_de"
         args.use_cuda = use_cuda
         ernie_config = ErnieConfig(args.ernie_config_path)
-        ernie_config.print_config()
+        #ernie_config.print_config()
         self.batch_size = batch_size
 
         if args.use_cuda:
@@ -111,10 +115,6 @@ class DualEncoder(object):
         args.ernie_config_path = model_path + config_dict['model_conf_path']
         args.vocab_path = model_path + config_dict['model_vocab_path']
         args.init_checkpoint = model_path + config_dict['model_checkpoint_path']
-        if 'model_name' in config_dict:
-            args.model_name = config_dict['model_name']
-        else:
-            args.model_name = 'my_de'
         if 'share_parameter' in config_dict:
             args.share_parameter = config_dict['share_parameter']
         else:

@@ -71,6 +71,7 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
     if rocketqa_model is False:
         print ("User-specified model", file=sys.stderr)
         conf_path = model
+        model_name = model
         if not os.path.isfile(conf_path):
             raise Exception("Config file [{}] not found".format(conf_path))
         try:
@@ -94,12 +95,13 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
     encoder_conf["use_cuda"] = use_cuda
     encoder_conf["device_id"] = device_id
     encoder_conf["batch_size"] = batch_size
+    encoder_conf["model_name"] = model_name
 
     if model_type[0] == "d":
         encoder = DualEncoder(**encoder_conf)
     elif model_type[0] == "c":
         encoder = CrossEncoder(**encoder_conf)
-
+    print ("Load model done", file=sys.stderr)
     return encoder
 
 

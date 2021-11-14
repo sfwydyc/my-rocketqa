@@ -121,7 +121,7 @@ para_list = [""]
 
 # conf
 ce_conf = {
-    "model": {path of config file},
+    "model": "./own_model/config.json",     # path of config file
     "use_cuda": True,
     "device_id": 0,
     "batch_size": 16
