@@ -111,7 +111,7 @@ p_embs = dual_encoder.encode_para(para=para_list)
 inner_products = dual_encoder.matching(query=query_list, para=para_list, title=title_list)
 ```
 
-#### Run Self-development Model
+### Run Self-development Model
 To run checkpoints, developers should write a config file, and set the parameter `model` in 'load_model()' method with the path of the config fille.
 
 ```python
@@ -119,7 +119,7 @@ import rocketqa
 
 query_list = ["交叉验证的作用"]
 title_list = ["交叉验证的介绍"]
-para_list = ["交叉验证(Cross-validation)主要用于建模应用中，例如PCR 、PLS                                            回归建模中。在给定的建模样本中，拿出大部分样本进行建模型，留小部分样本用刚建立的模型进行预报，并求这小部分样本的预报误差，记录它们的平方加和。"]
+para_list = ["交叉验证(Cross-validation)主要用于建模应用中，例如PCR 、PLS回归建模中。在给定的建模样本中，拿出大部分样本进行建模型，留小部分样本用刚建立的模型进行预报，并求这小部分样本的预报误差，记录它们的平方加和。"]
 
 # conf
 ce_conf = {
@@ -172,6 +172,7 @@ python3 app.py query ${query_file}
 
 ```bash
 cd examples/faiss_example/
+pip3 install requirements.txt
 
 # Index
 python3 index.py ${language} ${data_file} ${index_file}
@@ -180,6 +181,6 @@ python3 index.py ${language} ${data_file} ${index_file}
 python3 rocketqa_service.py ${language} ${data_file} ${index_file}
 
 # request
-python3 query.py query
+python3 query.py
 ```
 
