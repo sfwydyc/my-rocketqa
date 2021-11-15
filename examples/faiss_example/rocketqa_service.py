@@ -101,18 +101,25 @@ class RocketQAServer(web.RequestHandler):
         self.write(result_str)
 
 
-def create_rocketqa_app(sub_address, rocketqa_server, data_file, index_file):
+def create_rocketqa_app(sub_address, rocketqa_server, language, data_file, index_file):
     """
     Create RocketQA server application
     """
+    if language == 'zh':
+        de_model = 'zh_dureader_de'
+        ce_model = 'zh_dureader_ce'
+    else:
+        de_model = 'v1_marco_de'
+        ce_model = 'v1_marco_ce'
+
     de_conf = {
-        "model": "v1_marco_de",
+        "model": de_model,
         "use_cuda": True,
         "device_id": 0,
         "batch_size": 32
     }
     ce_conf = {
-        "model": "v1_marco_ce",
+        "model": ce_model,
         "use_cuda": True,
         "device_id": 0,
         "batch_size": 32
@@ -121,7 +128,7 @@ def create_rocketqa_app(sub_address, rocketqa_server, data_file, index_file):
     cross_encoder = rocketqa.load_model(**ce_conf)
 
     faiss_tool = FaissTool(data_file, index_file)
-    print ('load index done')
+    print ('Load index done')
 
     return web.Application([(sub_address, rocketqa_server, \
                         dict(faiss_tool=faiss_tool, \
@@ -131,17 +138,22 @@ def create_rocketqa_app(sub_address, rocketqa_server, data_file, index_file):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print ("USAGE: ")
-        print ("      python3 rocketqa_service.py ${data_file} ${index_file}")
-        print ("    --For Example:")
-        print ("      python3 rocketqa_service.py ../marco.tp.1k marco_test.index")
+        print ("      python3 rocketqa_service.py ${language} ${data_file} ${index_file}")
+        print ("--For Example:")
+        print ("      python3 rocketqa_service.py en ../marco.tp.1k marco_test.index")
         exit()
 
-    data_file = sys.argv[1]
-    index_file = sys.argv[2]
+    language = sys.argv[1]
+    if language != 'en' and language != 'zh':
+        print ("illegal language, only [zh] and [en] is supported", file=sys.stderr)
+        exit()
+
+    data_file = sys.argv[2]
+    index_file = sys.argv[3]
     sub_address = r'/rocketqa'
     port = '8888'
-    app = create_rocketqa_app(sub_address, RocketQAServer, data_file, index_file)
+    app = create_rocketqa_app(sub_address, RocketQAServer, language, data_file, index_file)
     app.listen(port)
     ioloop.IOLoop.current().start()

@@ -9,7 +9,7 @@ executors:
         - executors.py
     uses_with:
         model: v1_marco_de
-        use_cuda: False
+        use_cuda: True
         device_id: 5
         batch_size: 1
   - name: vec_indexer
@@ -25,7 +25,7 @@ executors:
     py_module:
         - executors.py
     uses_with:
-        model: v1_marco_de
-        use_cuda: False
+        model: v1_marco_ce
+        use_cuda: True
         device_id: 4
         batch_size: 32

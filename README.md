@@ -20,7 +20,8 @@ RocketQA focus on improving the dense contexts retrieval stage, and propose the 
 * ***First-Chinese-model***, RocketQA-zh is the first open source Chinese dense retrieval model.
 * ***Easy-to-use***, both python installation package and DOCKER environment are provided.
 * ***Solution-for-QA-system***, developers can build an End-to-End QA system with one line of code.
-
+  
+  
 
 ## Installation
 
@@ -48,9 +49,10 @@ docker pull rocketqa_docker_name
 
 docker run -it rocketqa_docker_name
 ```
-
+  
+  
 ## API
-The RocketQA development tool provides two kind of models, one is ERNIE-based twin towers dual-encoder for answer retrieval, anthor is ERNIE-based cross encoder for answer reranking. And development tool provides the following methods:
+The RocketQA development tool provides two kind of models, one is ERNIE-based dual-encoder for answer retrieval, anthor is ERNIE-based cross encoder for answer reranking. And development tool provides the following methods:
 
 #### `rocketqa.available_models()`
 
@@ -70,11 +72,11 @@ Given a list of queries, returns vector representations encoded by model.
 
 #### `model.encode_para(para: List[str], )`
 
-Given a list of passages and their titles (optional), returns the representations encoded by model.
+Given a list of passages and their corresponding titles (optional), returns vector representations encoded by model.
 
 #### `model.matching(query: List[str], para: List[str], )`
 
-Given a list of queries and passages (titles), returns their matching scores (inner product of their representations).
+Given a list of queries and passages (and titles), returns their matching scores (inner product of their representations). 
 
 ---
 
@@ -82,15 +84,15 @@ Cross-encoder returned by "load_model()" supports the following method:
 
 #### `model.matching(query: List[str], para: List[str], )`
 
-Given a list of queries and passages (titles), returns their matching scoress (probability that paragraph is query's right answer).
-
+Given a list of queries and passages (and titles), returns their matching scores (probability that paragraph is query's right answer).
+  
+  
 
 ## Examples
 
-### Run Prediction
 With the examples below, developers can run RocketQA models or their own checkpoints. 
 
-####  Run RocketQA Model
+###  Run RocketQA Model
 To run RocketQA models, developers should set the parameter `model` in 'load_model()' method with RocketQA model name return by 'available_models()' method. 
 
 ```python
@@ -115,9 +117,9 @@ To run checkpoints, developers should write a config file, and set the parameter
 ```python
 import rocketqa
 
-query_list = [""]
-title_list = [""]
-para_list = [""]
+query_list = ["交叉验证的作用"]
+title_list = ["交叉验证的介绍"]
+para_list = ["交叉验证(Cross-validation)主要用于建模应用中，例如PCR 、PLS                                            回归建模中。在给定的建模样本中，拿出大部分样本进行建模型，留小部分样本用刚建立的模型进行预报，并求这小部分样本的预报误差，记录它们的平方加和。"]
 
 # conf
 ce_conf = {
@@ -134,7 +136,7 @@ cross_encoder = rocketqa.load_model(**ce_conf)
 ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
 ```
 
-The config file is JSON format file.
+The config file is a JSON format file.
 ```bash
 {
     "model_type": "cross_encoder",
@@ -145,6 +147,7 @@ The config file is JSON format file.
     "joint_training": 0
 }
 ```
+  
 
 
 ## Start your QA-System
@@ -152,7 +155,16 @@ The config file is JSON format file.
 With the examples blow, you can build your own QA-System
 
 ### Running with JINA
+```bash
+cd examples/jina_example/
+pip3 install requirements.txt
 
+# Index
+python3 app.py index ${data_file}
+
+# Search
+python3 app.py query ${query_file}
+```
 
 
 
@@ -162,12 +174,12 @@ With the examples blow, you can build your own QA-System
 cd examples/faiss_example/
 
 # Index
-python3 index.py ${data_file} ${index_file}
+python3 index.py ${language} ${data_file} ${index_file}
 
 # Start service
-python3 rocketqa_service.py ${data_file} ${index_file}
+python3 rocketqa_service.py ${language} ${data_file} ${index_file}
 
 # request
-python3 query.py
+python3 query.py query
 ```
 

@@ -4,10 +4,11 @@ import json
 
 SERVICE_ADD = 'http://10.12.35.41:8888/rocketqa'
 TOPK = 5
-QUERY_FILE = '../marco.q'
 
-for line in open(QUERY_FILE, 'r'):
-    query = line.strip()
+while 1:
+    query = input("please input a query:\t")
+    if query.strip() == '':
+        break
 
     input_data = {}
     input_data['query'] = query
@@ -23,7 +24,4 @@ for line in open(QUERY_FILE, 'r'):
         para = res_json['answer'][i]['para']
         score = res_json['answer'][i]['probability']
         print ('{}'.format(i + 1) + '\t' + title + '\t' + para + '\t' + str(score))
-    break
-
-
 
