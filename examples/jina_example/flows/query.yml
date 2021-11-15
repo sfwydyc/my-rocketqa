@@ -1,0 +1,35 @@
+!Flow
+version: '1'
+with:
+  port_expose: 8886
+pods:
+  - name: du_encoder
+    uses: DualEncoder
+    py_module:
+        - executors.py
+    uses_with:
+        model: v1_marco_de
+        use_cuda: True
+        device_id: 5
+        batch_size: 32
+  - name: vec_indexer
+    uses: jinahub://SimpleIndexer/v0.4
+    uses_with:
+        match_args:
+            metric: 'cosine'
+            limit: 50
+            traversal_ldarray:
+              - 'r'
+            traversal_rdarray:
+              - 'c'
+    polling: 'ALL'
+    uses_after: jinahub://MatchMerger/v0.2
+  - name: ranker
+    uses: CrossEncoder
+    py_module:
+        - executors.py
+    uses_with:
+        model: v1_marco_de
+        use_cuda: True
+        device_id: 4
+        batch_size: 32

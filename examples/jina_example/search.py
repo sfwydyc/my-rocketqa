@@ -1,15 +1,11 @@
 import os
 import click
-import paddle
-from jina import Document,DocumentArray,Flow,Executor,requests
 
-os.environ['FLAGS_eager_delete_tensor_gb'] = '0'  # enable gc
-# paddle.set_device('cpu')
+os.environ['FLAGS_eager_delete_tensor_gb'] = '0'
 paddle.enable_static()
 
 def print_topk(req_obj, sentence, rerank=False):
     for d in req_obj.data.docs:
-        print(f'Ta-Dah🔮, here are what we found for: {sentence}')
         for idx, match in enumerate(d.matches):
             if rerank:
                 score = match.scores['rerank_score'].value

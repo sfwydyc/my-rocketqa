@@ -1,0 +1,18 @@
+!Flow
+version: '1'
+executors:
+  - name: du_encoder
+    uses: DualEncoder
+    py_module:
+        - executors.py
+    uses_with:
+        model: v1_marco_de
+        use_cuda: True
+        device_id: 5
+        batch_size: 32
+  - name: vec_indexer
+    uses: jinahub://SimpleIndexer/v0.4
+    needs: du_encoder
+    uses_metas:
+        workspace: './workspace_tmp'
+
