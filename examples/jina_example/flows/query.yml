@@ -2,26 +2,22 @@
 version: '1'
 with:
   port_expose: 8886
-pods:
+executors:
   - name: du_encoder
     uses: DualEncoder
     py_module:
         - executors.py
     uses_with:
         model: v1_marco_de
-        use_cuda: True
+        use_cuda: False
         device_id: 5
-        batch_size: 32
+        batch_size: 1
   - name: vec_indexer
-    uses: jinahub://SimpleIndexer/v0.4
+    uses: jinahub://SimpleIndexer/latest
     uses_with:
         match_args:
             metric: 'cosine'
-            limit: 50
-            traversal_ldarray:
-              - 'r'
-            traversal_rdarray:
-              - 'c'
+            limit: 20
     polling: 'ALL'
     uses_after: jinahub://MatchMerger/v0.2
   - name: ranker
@@ -30,6 +26,6 @@ pods:
         - executors.py
     uses_with:
         model: v1_marco_de
-        use_cuda: True
+        use_cuda: False
         device_id: 4
         batch_size: 32

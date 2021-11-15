@@ -1,48 +1,37 @@
-import sys
-import requests as py_requests
-
-from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+import numpy as np
 
 from jina import Document, DocumentArray, Executor, requests
+from jina.types.score import NamedScore
 from jina.logging.logger import JinaLogger
 
 import rocketqa
 
+
 class DualEncoder(Executor):
     def __init__(self, model, use_cuda=False, device_id=0, batch_size=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger = JinaLogger('RocketQA-Executor')
+        self.logger = JinaLogger(str(self.__class__))
         self.encoder = rocketqa.load_model(model=model, use_cuda=use_cuda, device_id=device_id, batch_size=batch_size)
         self.b_s = batch_size
-        self.logger.info('Retriever init done')
 
     @requests(on='/index')
-    def encode(self, docs, **kwargs):
-        fff = open('p_emb', 'a')
-        for batch in docs.batch(batch_size=32):
-            tags = batch.get_attributes('tags')
-            titles = []
-            paras = []
-            for tag in tags:
-                titles.append(tag['title'])
-                paras.append(tag['para'])
-            #for i in  range(len(titles)):
-            #    fff.write(titles[i] + '\t' + paras[i] + '\n')
+    def encode_index(self, docs, **kwargs):
+        batch_generator = (docs
+                           .traverse_flat(
+            traversal_paths=('r',),
+            filter_fn=lambda d: d.tags.get('title', None) is not None and d.tags.get('para', None) is not None)
+                           .batch(batch_size=32))
+        for batch in batch_generator:
+            titles, paras = batch.get_attributes('tags__title', 'tags__para')
             para_embs = self.encoder.encode_para(para=paras, title=titles)
-            for emb in para_embs:
-                fff.write(' '.join(str(ii) for ii in emb) + '\n')
-            batch.embedding = para_embs
+            for doc, emb in zip(batch, para_embs):
+                doc.embedding = emb.squeeze()
 
     @requests(on='/search')
-    def encode(self, docs, **kwargs):
-        fff = open('q_emb', 'w')
+    def encode_search(self, docs, **kwargs):
         for doc in docs:
-            query = doc.text
-            #fff.write(query + '\n')
-            query_emb = self.encoder.encode_query(query=[query])
-            fff.write(' '.join(str(ii) for ii in query_emb[0]) + '\n')
-            doc.embedding = query_emb
+            query_emb = self.encoder.encode_query(query=[doc.text])
+            doc.embedding = query_emb.squeeze()
 
 
 class CrossEncoder(Executor):
@@ -51,27 +40,29 @@ class CrossEncoder(Executor):
         self.logger = JinaLogger(str(self.__class__))
         self.encoder = rocketqa.load_model(model=model, use_cuda=use_cuda, device_id=device_id, batch_size=batch_size)
         self.b_s = batch_size
-        self.logger.info('Reranker init done')
 
     @requests(on='/search')
     def rank(self, docs, **kwargs):
-        if not docs:
-            return None
-
         for doc in docs:
+            question = doc.text
+            print(f'question: {question}')
             doc_arr = DocumentArray([doc])
-            match_batches_generator = doc_arr.batch(
-                traversal_paths=['m'],
-                batch_size=self.b_s,
-                require_attr='text',
-            )
-            self.logger.info(doc.text)
-            self.logger.info('ANN Ranker !!!')
-            self.logger.info('ann matches : ' + str(len(doc.matches)))
+            match_batches_generator = (doc_arr
+                                       .traverse_flat(traversal_paths=('m',))
+                                       .batch(batch_size=self.b_s))
 
+            reranked_matches = DocumentArray()
             for matches in match_batches_generator:
-                # logger.info(matches[0])
-                question = doc_arr[0].text
-                oris = matches.get_attributes('text')
-                titles = matches.get_attributes('tag')
-
+                titles, paras = matches.get_attributes('tags__title', 'tags__para')
+                score_list = np.random.rand(len(paras))
+                # score_list = self.encoder.matching(query=self.fill_in(question), para=paras, title=titles)
+                sorted_args = np.argsort(score_list).tolist()
+                sorted_args.reverse()
+                for idx in sorted_args:
+                    para = paras[idx]
+                    title = titles[idx]
+                    score = score_list[idx]
+                    m = Document(text=f'{title}\t{para}')
+                    m.scores['relevance'] = NamedScore(value=score)
+                    reranked_matches.append(m)
+            doc.matches = reranked_matches
