@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 from jina import Document, DocumentArray, Flow
 
 
@@ -8,37 +9,33 @@ def index(file_name):
         cnt = 0
         docs = DocumentArray()
         for line in open(file_name):
-            doc = Document(id=cnt, uri=file_name)
+            doc = Document(id=f'{cnt}', uri=file_name)
             title, para = line.strip().split('\t')
             doc.tags['title'] = title
             doc.tags['para'] = para
             cnt += 1
             docs.append(doc)
-        f.post(on='/index', inputs=docs, show_progress=True)
+        resp = f.post(on='/index', inputs=docs, show_progress=True, return_results=True)
+    for doc in resp[0].docs:
+        print(f'{doc.tags["title"]}, {doc.tags["para"]}, {doc.embedding.shape}')
+        # print(f'{doc.tags}, {doc.embedding.shape}')
 
 
 def query():
-
     f = Flow().load_config('flows/query.yml')
     with f:
-        #while True:
-        #    text = input('please type a query: ')
-        #    if not text:
-        #        break
         resp = f.post(on='/search', inputs=[Document(text="what is paula deen's brother")], return_results=True)
-
-
-def query_restful(return_flow=False):
-    f = Flow().load_config('flows/query.yml')
-    f.use_rest_gateway()
-    if return_flow:
-        return f
-    with f:
-        f.block()
+    for d in resp[0].docs:
+        print(f'{d.text} {d.embedding.shape}: {len(d.matches)}')
+        for m in d.matches:
+            print(f'+- {m.text}, {m.scores["relevance"].value}')
 
 
 def main(task):
     if task == 'index':
+        if Path('./workspace').exists():
+            print('./workspace exists, please deleted it before reindexing')
+            return
         index('toy_data/test.tsv')
     elif task == 'query':
         query()
