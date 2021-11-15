@@ -16,9 +16,8 @@ def index(file_name):
             cnt += 1
             docs.append(doc)
         resp = f.post(on='/index', inputs=docs, show_progress=True, return_results=True)
-    for doc in resp[0].docs:
-        print(f'{doc.tags["title"]}, {doc.tags["para"]}, {doc.embedding.shape}')
-        # print(f'{doc.tags}, {doc.embedding.shape}')
+    #for doc in resp[0].docs:
+    #    print(f'{doc.tags["title"]}, {doc.tags["para"]}, {doc.embedding.shape}')
 
 
 def query():
@@ -36,7 +35,7 @@ def main(task):
         if Path('./workspace').exists():
             print('./workspace exists, please deleted it before reindexing')
             return
-        index('toy_data/test.tsv')
+        index('../marco.tp.1k')
     elif task == 'query':
         query()
 

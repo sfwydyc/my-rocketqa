@@ -157,7 +157,7 @@ With the examples blow, you can build your own QA-System
 ### Running with JINA
 ```bash
 cd examples/jina_example/
-pip3 install requirements.txt
+pip3 install -r requirements.txt
 
 # Index
 python3 app.py index ${data_file}
@@ -172,7 +172,7 @@ python3 app.py query ${query_file}
 
 ```bash
 cd examples/faiss_example/
-pip3 install requirements.txt
+pip3 install -r requirements.txt
 
 # Index
 python3 index.py ${language} ${data_file} ${index_file}

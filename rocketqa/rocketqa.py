@@ -6,6 +6,7 @@ import urllib
 import numpy as np
 import tarfile
 import warnings
+import hashlib
 from tqdm import tqdm
 from rocketqa.predict.dual_encoder import DualEncoder
 from rocketqa.predict.cross_encoder import CrossEncoder
@@ -19,7 +20,7 @@ __MODELS = {
         "v1_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_de.tar.gz",
         "v1_nq_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_ce.tar.gz",
         "pair_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_marco_de.tar.gz",
-        "pair_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_marco_ce.tar.gz",
+        "pair_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_nq_de.tar.gz",
         "v2_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_de.tar.gz",
         "v2_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_ce.tar.gz",
         "v2_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_nq_de.tar.gz",
@@ -27,6 +28,19 @@ __MODELS = {
         "zh_dureader_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_ce.tar.gz"
 }
 
+__MODELS_MD5 = {
+        "v1_marco_de": "d8210e4080935bd7fdad7a394cd60b66",
+        "v1_marco_ce": "caec5aedc46f22edd7107ecd793fc7fb",
+        "v1_nq_de": "cfeb70f82087b8a47bb0d6d6cfcd61c5",
+        "v1_nq_ce": "15aac78d70cc25994016b8a30d80f12c",
+        "pair_marco_de": "b4080ffa2999525e5ba2aa1f4e03a9e8",
+        "pair_nq_de": "d770bc379ec6def7e0588ec02c80ace2",
+        "v2_marco_de": "4ce64ff35d1d831f0ca989e49abde227",
+        "v2_marco_ce": "915ea7ff214a4a92a3a1e1d56c3fb469",
+        "v2_nq_de": "8f177aa75cadaad6656dcd981edc983b",
+        "zh_dureader_de": "673ff667bdb3b315a7e2e1b5624babc4",
+        "zh_dureader_ce": "5e8e6a026e1cb7600fc7e9250f79beb1"
+}
 
 def available_models():
     """
@@ -54,12 +68,13 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
 
     if model in __MODELS:
         model_name = model
-        print ("RocketQA model [{}]".format(model_name), file=sys.stderr)
+        print (f"RocketQA model [{model_name}]", file=sys.stderr)
         rocketqa_model = True
         model_path = os.path.expanduser('~/.rocketqa/') + model_name + '/'
         if not os.path.exists(model_path):
             if __download(model_name) is False:
-                raise Exception("RocketQA model [{}] not found".format(model_name))
+                raise Exception(f"RocketQA model [{model_name}] download failed, \
+                        please check model dir [{model_path}]")
 
         encoder_conf['conf_path'] = model_path + 'config.json'
         encoder_conf['model_path'] = model_path
@@ -73,12 +88,12 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
         conf_path = model
         model_name = model
         if not os.path.isfile(conf_path):
-            raise Exception("Config file [{}] not found".format(conf_path))
+            raise Exception(f"Config file [{conf_path}] not found")
         try:
             with open(conf_path, 'r', encoding='utf8') as json_file:
                 config_dict = json.load(json_file)
         except Exception as e:
-            raise Exception(str(e) + "\nConfig file [{}] load failed".format(conf_path))
+            raise Exception(str(e) + f"\nConfig file [{conf_path}] load failed")
 
         encoder_conf['conf_path'] = conf_path
 
@@ -111,10 +126,8 @@ def __download(model_name):
     download_dst = os.path.join(os.path.expanduser('~/.rocketqa/') + filename)
     download_url = __MODELS[model_name]
 
-    if os.path.exists(download_dst):
-        print ("RocketQA model [{}] exists".format(model_name), file=sys.stderr)
-    else:
-        print ("Download RocketQA model [{}]".format(model_name), file=sys.stderr)
+    if not os.path.exists(download_dst):
+        print (f"Download RocketQA model [{model_name}]", file=sys.stderr)
         with urllib.request.urlopen(download_url) as source, open(download_dst, "wb") as output:
             with tqdm(total=int(source.info().get("Content-Length")), ncols=80, unit='iB', unit_scale=True, unit_divisor=1024) as loop:
                 while True:
@@ -125,6 +138,9 @@ def __download(model_name):
                     output.write(buffer)
                     loop.update(len(buffer))
 
+    file_md5= __get_file_md5(download_dst)
+    if file_md5 != __MODELS_MD5[model_name]:
+        raise Exception(f"Model file [{download_dst}] exists, but md5 doesnot match")
 
     try:
         t = tarfile.open(download_dst)
@@ -134,6 +150,17 @@ def __download(model_name):
         return False
 
     return True
+
+def __get_file_md5(fname):
+    m = hashlib.md5()
+    with open(fname,'rb') as fobj:
+        while True:
+            data = fobj.read(4096)
+            if not data:
+                break
+            m.update(data)
+
+    return m.hexdigest()
 
 
 if __name__ == '__main__':

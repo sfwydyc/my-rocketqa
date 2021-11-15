@@ -10,7 +10,7 @@ executors:
     uses_with:
         model: v1_marco_de
         use_cuda: True
-        device_id: 5
+        device_id: 0
         batch_size: 1
   - name: vec_indexer
     uses: jinahub://SimpleIndexer/latest
@@ -27,5 +27,5 @@ executors:
     uses_with:
         model: v1_marco_ce
         use_cuda: True
-        device_id: 4
+        device_id: 0
         batch_size: 32
