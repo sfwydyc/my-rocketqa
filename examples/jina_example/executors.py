@@ -52,17 +52,20 @@ class CrossEncoder(Executor):
                                        .batch(batch_size=self.b_s))
 
             reranked_matches = DocumentArray()
+            reranked_scores = []
+            reranked_texts = []
             for matches in match_batches_generator:
                 titles, paras = matches.get_attributes('tags__title', 'tags__para')
                 score_list = np.random.rand(len(paras))
                 # score_list = self.encoder.matching(query=self.fill_in(question), para=paras, title=titles)
-                sorted_args = np.argsort(score_list).tolist()
-                sorted_args.reverse()
-                for idx in sorted_args:
-                    para = paras[idx]
-                    title = titles[idx]
-                    score = score_list[idx]
-                    m = Document(text=f'{title}\t{para}')
-                    m.scores['relevance'] = NamedScore(value=score)
-                    reranked_matches.append(m)
+                reranked_scores.extend(score_list)
+                reranked_texts.extend([f'{title}\t{para}' for title, para in zip(titles, paras)])
+            sorted_args = np.argsort(reranked_scores).tolist()
+            sorted_args.reverse()
+            for idx in sorted_args:
+                score = reranked_scores[idx]
+                text = reranked_texts[idx]
+                m = Document(text=f'{text}')
+                m.scores['relevance'] = NamedScore(value=score)
+                reranked_matches.append(m)
             doc.matches = reranked_matches
