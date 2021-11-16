@@ -160,10 +160,10 @@ cd examples/jina_example/
 pip3 install -r requirements.txt
 
 # Index
-python3 app.py index ${data_file}
+python3 app.py index
 
 # Search
-python3 app.py query ${query_file}
+python3 app.py query
 ```
 
 
