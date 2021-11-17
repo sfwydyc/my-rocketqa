@@ -2,6 +2,8 @@
 version: '1'
 with:
   port_expose: 8886
+  protocol: 'http'
+  cors: True
 executors:
   - name: du_encoder
     uses: DualEncoder

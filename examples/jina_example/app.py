@@ -1,4 +1,5 @@
 import sys
+import webbrowser
 from pathlib import Path
 from jina import Document, DocumentArray, Flow
 
@@ -19,13 +20,18 @@ def index(file_name):
 
 
 def query():
+    url_html_fn = Path(__file__).parent.absolute() / 'static/index.html'
+    url_html_path = f'file://{url_html_fn}'
     f = Flow().load_config('flows/query.yml')
     with f:
-        resp = f.post(on='/search', inputs=[Document(text="what is paula deen's brother")], return_results=True)
-    for d in resp[0].docs:
-        print(f'{d.text} {d.embedding.shape}: {len(d.matches)}')
-        for m in d.matches:
-            print(f'+- {m.text}, {m.scores["relevance"].value}')
+        try:
+            webbrowser.open(url_html_path, new=2)
+        except:
+            pass
+        finally:
+            print(f'You should see a demo page opened in your browser'
+                  f'if not, you may open {url_html_path} manually')
+        f.block()
 
 
 def main(task):
