@@ -47,7 +47,7 @@ class CrossEncoder(Executor):
             question = doc.text
             doc_arr = DocumentArray([doc])
             match_batches_generator = (doc_arr
-                                       .traverse_flat(traversal_paths=('m',))
+                                       .traverse_flat(traversal_paths='m')
                                        .batch(batch_size=self.b_s))
 
             reranked_matches = DocumentArray()
@@ -55,10 +55,7 @@ class CrossEncoder(Executor):
             reranked_texts = []
             for matches in match_batches_generator:
                 titles, paras = matches.get_attributes('tags__title', 'tags__para')
-                q_list = []
-                while len(q_list) < len(paras):
-                    q_list.append(question)
-                score_list = self.encoder.matching(query=q_list, para=paras, title=titles)
+                score_list = self.encoder.matching(query=[question] * len(paras), para=paras, title=titles)
                 reranked_scores.extend(score_list)
                 reranked_texts.extend([f'{title}\t{para}' for title, para in zip(titles, paras)])
             sorted_args = np.argsort(reranked_scores).tolist()
