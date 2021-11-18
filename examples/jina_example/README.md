@@ -7,8 +7,9 @@ This is a simple Demo of how to use RocketQA together with [Jina](http://get.jin
 > **Prerequisites**: Make sure `docker` is installed and running on your machine
 
 
-```shell
-docker build -t rocketqa-jina .  # delete this line once the docker image is published
+```shell  
+# delete this line once the docker image is published
+docker build -t rocketqa-jina -f docker/cpu/Dockerfile .
 docker run --rm -it -v "$(pwd)/workspace:/rocketqa/workspace" -v "$(pwd)/model:/root/.rocketqa" rocketqa-jina:latest index
 ```
 
