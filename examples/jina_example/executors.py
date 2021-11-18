@@ -2,35 +2,8 @@ import numpy as np
 
 from jina import Document, DocumentArray, Executor, requests
 from jina.types.score import NamedScore
-from jina.logging.logger import JinaLogger
 
 import rocketqa
-
-
-class DualEncoder(Executor):
-    def __init__(self, model, use_cuda=False, device_id=0, batch_size=1, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.encoder = rocketqa.load_model(model=model, use_cuda=use_cuda, device_id=device_id, batch_size=batch_size)
-        self.b_s = batch_size
-
-    @requests(on='/index')
-    def encode_index(self, docs, **kwargs):
-        batch_generator = (docs
-                           .traverse_flat(
-            traversal_paths=('r',),
-            filter_fn=lambda d: d.tags.get('title', None) is not None and d.tags.get('para', None) is not None)
-                           .batch(batch_size=32))
-        for batch in batch_generator:
-            titles, paras = batch.get_attributes('tags__title', 'tags__para')
-            para_embs = self.encoder.encode_para(para=paras, title=titles)
-            for doc, emb in zip(batch, para_embs):
-                doc.embedding = emb.squeeze()
-
-    @requests(on='/search')
-    def encode_search(self, docs, **kwargs):
-        for doc in docs:
-            query_emb = self.encoder.encode_query(query=[doc.text])
-            doc.embedding = query_emb.squeeze()
 
 
 class CrossEncoder(Executor):

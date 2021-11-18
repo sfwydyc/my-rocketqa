@@ -53,9 +53,9 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
     """
     Load a RocketQA model or an user-specified checkpoint
     Args:
-        model: A model name return by `rocketqa.availabel_models()` or the path of an user-specified checkpoint config
+        model: A model name return by `rocketqa.available_models()` or the path of an user-specified checkpoint config
         use_cuda: Whether to use GPU
-        devicd_id: The device to put the model
+        device_id: The device to put the model
         batch_size: Batch_size during inference
     Returns:
         model
