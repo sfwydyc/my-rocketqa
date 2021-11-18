@@ -1,22 +1,28 @@
 import sys
 import webbrowser
 from pathlib import Path
-from jina import Document, DocumentArray, Flow
+from jina import Document, Flow
 
 
 def index(file_name):
+    def load_marco(fn):
+        cnt = 0
+        with open(fn, 'r') as f:
+            for ln, line in enumerate(f):
+                try:
+                    title, para = line.strip().split('\t')
+                    doc = Document(
+                        id=f'{cnt}',
+                        uri=fn,
+                        tags={'title': title, 'para': para})
+                    cnt += 1
+                    yield doc
+                except:
+                    print(f'skip line {ln}')
+                    continue
     f = Flow().load_config('flows/index.yml')
     with f:
-        cnt = 0
-        docs = DocumentArray()
-        for line in open(file_name):
-            doc = Document(id=f'{cnt}', uri=file_name)
-            title, para = line.strip().split('\t')
-            doc.tags['title'] = title
-            doc.tags['para'] = para
-            cnt += 1
-            docs.append(doc)
-        resp = f.post(on='/index', inputs=docs, show_progress=True, return_results=True)
+        f.post(on='/index', inputs=load_marco(file_name), show_progress=True, request_size=32)
 
 
 def query():
@@ -34,14 +40,40 @@ def query():
         f.block()
 
 
+def query_cli():
+    def print_topk(resp):
+        for doc in resp.docs:
+            print(doc)
+            doc = Document(doc)
+            print(f'🤖 Answers:')
+            for m in doc.matches:
+                print(f'\t{m.tags["title"]}')
+                print(f'\t{m.tags["para"]}')
+                print(f'-----')
+    f = Flow().load_config('flows/query.yml')
+    with f:
+        f.protocol = 'grpc'
+        print(f'🤖 Hi there, please ask me questions related to the indexed Documents.\n'
+              'For example, "Who is Paula Deen\'s brother?"\n')
+        while True:
+            text = input('Question: (type \q to quit)')
+            if text == '\q':
+                return
+            f.post(on='/search', inputs=[Document(content=text),], on_done=print_topk)
+
+
 def main(task):
     if task == 'index':
         if Path('./workspace').exists():
             print('./workspace exists, please deleted it before reindexing')
             return
-        index('../marco.tp.1k')
+        data_fn = sys.argv[2] if len(sys.argv) >= 3 else '../marco.tp.1k'
+        print(f'indexing {data_fn}')
+        index(data_fn)
     elif task == 'query':
         query()
+    elif task == 'query_cli':
+        query_cli()
 
 
 if __name__ == '__main__':

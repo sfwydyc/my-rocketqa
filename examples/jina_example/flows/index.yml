@@ -11,6 +11,6 @@ executors:
         device_id: 5
         batch_size: 32
   - name: vec_indexer
-    uses: jinahub://SimpleIndexer/latest
+    uses: jinahub://SimpleIndexer/v0.9
     uses_metas:
         workspace: './workspace'
