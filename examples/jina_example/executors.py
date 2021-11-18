@@ -10,7 +10,6 @@ import rocketqa
 class DualEncoder(Executor):
     def __init__(self, model, use_cuda=False, device_id=0, batch_size=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger = JinaLogger(str(self.__class__))
         self.encoder = rocketqa.load_model(model=model, use_cuda=use_cuda, device_id=device_id, batch_size=batch_size)
         self.b_s = batch_size
 
@@ -37,7 +36,6 @@ class DualEncoder(Executor):
 class CrossEncoder(Executor):
     def __init__(self, model, use_cuda=False, device_id=0, batch_size=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger = JinaLogger(str(self.__class__))
         self.encoder = rocketqa.load_model(model=model, use_cuda=use_cuda, device_id=device_id, batch_size=batch_size)
         self.b_s = batch_size
 
