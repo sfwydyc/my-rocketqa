@@ -7,11 +7,11 @@ executors:
         - executors.py
     uses_with:
         model: v1_marco_de
-        use_cuda: False
-        device_id: 5
+        use_cuda: $JINA_USE_CUDA
+        device_id: 0
         batch_size: 32
     timeout_ready: '-1'
   - name: vec_indexer
     uses: jinahub://SimpleIndexer/v0.9
     uses_metas:
-        workspace: './workspace'
+        workspace: $JINA_WORKSPACE

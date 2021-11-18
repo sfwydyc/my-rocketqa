@@ -1,10 +1,10 @@
-# RocketQA❤️Jina
+# Jina❤️RocketQA
 
-This is a simple Demo of how to use RocketQA together with Jina.
+This is a simple Demo of how to use RocketQA together with [Jina](http://get.jina.ai/). Jina is a Cloud-native neural search framework for _**any**_ kind of data
 
 ## Run Quick Demos
 
-> Make sure `docker` is installed and running on your machine
+> **Prerequisites**: Make sure `docker` is installed and running on your machine
 
 
 ```shell
@@ -23,8 +23,6 @@ If you prefer to use CLI, please run
 ```shell
 docker run --rm -it -v "$(pwd)/workspace:/rocketqa/workspace" -v "$(pwd)/model:/root/.rocketqa" rocketqa-jina:latest query_cli
 ```
-
-
 
 
 ## Usages
@@ -63,3 +61,8 @@ If you prefer to use the shell, please try
 ```shell
 python app.py query_cli
 ```
+
+
+### Tips
+
+If you have GPUs, please set `export JINA_USE_CUDA=True`.

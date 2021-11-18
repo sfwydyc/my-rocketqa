@@ -1,7 +1,14 @@
 import sys
+import os
 import webbrowser
 from pathlib import Path
 from jina import Document, Flow
+
+
+def config():
+    os.environ.setdefault('JINA_USE_CUDA', 'False')
+    os.environ.setdefault('JINA_PORT_EXPOSE', '8886')
+    os.environ.setdefault('JINA_WORKSPACE', './workspace')
 
 
 def index(file_name):
@@ -26,8 +33,20 @@ def index(file_name):
         f.post(on='/index', inputs=load_marco(file_name), show_progress=True, request_size=32)
 
 
+def fillin_html():
+    source_fn = Path(__file__).parent.absolute() / 'static/index_template.html'
+    target_fn = Path(__file__).parent.absolute() / 'static/index.html'
+
+    with open(source_fn, 'r') as fp, open(target_fn, 'w') as fw:
+        t = fp.read()
+        t = t.replace('{% JINA_PORT_EXPOSE %}',
+                      f'{os.environ.get("JINA_PORT_EXPOSE")}')
+        fw.write(t)
+
+
 def query():
     from distutils.dir_util import copy_tree
+    fillin_html()
     copy_tree('static', 'workspace/static')
     url_html_fn = Path(__file__).parent.absolute() / 'workspace/static/index.html'
     url_html_path = f'file://{url_html_fn}'
@@ -67,6 +86,7 @@ def query_cli():
 
 
 def main(task):
+    config()
     if task == 'index':
         if Path('./workspace').exists():
             print('./workspace exists, please deleted it if you want to reindexi')
