@@ -2,6 +2,31 @@
 
 This is a simple Demo of how to use RocketQA together with Jina.
 
+## Run Quick Demos
+
+> Make sure `docker` is installed and running on your machine
+
+
+```shell
+docker build -t rocketqa-jina .  # delete this line once the docker image is published
+docker run --rm -it -v "$(pwd)/workspace:/rocketqa/workspace" -v "$(pwd)/model:/root/.rocketqa" rocketqa-jina:latest index
+```
+
+The above codes will download the models to `model` folder and index the data at `toy_data/test.tsv` from the Docker image. The index will be stored at `workspace` folder. You can start asking questions via your browser by running the following command and open `workspace/static/index.html` in your browser.
+
+```shell
+docker run --rm -it -v "$(pwd)/workspace:/rocketqa/workspace" -v "$(pwd)/model:/root/.rocketqa" -p 8886:8886 rocketqa-jina:latest query
+```
+
+If you prefer to use CLI, please run
+
+```shell
+docker run --rm -it -v "$(pwd)/workspace:/rocketqa/workspace" -v "$(pwd)/model:/root/.rocketqa" rocketqa-jina:latest query_cli
+```
+
+
+
+
 ## Usages
 
 ### Install Dependencies

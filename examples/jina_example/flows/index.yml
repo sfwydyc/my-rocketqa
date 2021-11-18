@@ -10,6 +10,7 @@ executors:
         use_cuda: False
         device_id: 5
         batch_size: 32
+    timeout_ready: '-1'
   - name: vec_indexer
     uses: jinahub://SimpleIndexer/v0.9
     uses_metas:
