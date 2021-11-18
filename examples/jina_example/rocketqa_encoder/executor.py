@@ -5,13 +5,13 @@ import rocketqa
 
 class RocketQADualEncoder(Executor):
     """
-    Calculate the `embedding` for `text` with RocketQA model.
+    Calculate the `embedding` for `text` with RocketQA encoding model.
     """
     def __init__(self, model, use_cuda=False, device_id=0, batch_size=1, *args, **kwargs):
         """
-        :param model: A model name return by `rocketqa.available_models()` or the path of an user-specified checkpoint config
-        :param use_cuda: Set to `True` (default: `False`) to use GPU
-        :param device_id: The GPU device id to load the model. Set to integers starting from 0 to `N`, where `N` is the number of GPUs minus 1.
+        :param model: A model name return by `rocketqa.available_models()` or the path of an user-specified
+        checkpoint config :param use_cuda: Set to `True` (default: `False`) to use GPU :param device_id: The GPU
+        device id to load the model. Set to integers starting from 0 to `N`, where `N` is the number of GPUs minus 1.
         :param batch_size: the batch size during inference.
         """
         super().__init__(*args, **kwargs)
@@ -19,7 +19,7 @@ class RocketQADualEncoder(Executor):
         self.b_s = batch_size
 
     @requests(on='/index')
-    def encode_answers(self, docs, **kwargs):
+    def encode_para(self, docs, **kwargs):
         batch_generator = (docs
                            .traverse_flat(
             traversal_paths=('r',),
@@ -32,7 +32,7 @@ class RocketQADualEncoder(Executor):
                 doc.embedding = emb.squeeze()
 
     @requests(on='/search')
-    def encode_questions(self, docs, **kwargs):
+    def encode_query(self, docs, **kwargs):
         for doc in docs:
             query_emb = self.encoder.encode_query(query=[doc.text])
             doc.embedding = query_emb.squeeze()

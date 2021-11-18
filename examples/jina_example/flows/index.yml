@@ -4,7 +4,7 @@ executors:
   - name: du_encoder
     uses: RocketQADualEncoder
     py_module:
-        - rocketqa_dual_encoder/executor.py
+        - rocketqa_encoder/executor.py
     uses_with:
         model: v1_marco_de
         use_cuda: $JINA_USE_CUDA
