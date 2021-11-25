@@ -108,7 +108,7 @@ dual_encoder = rocketqa.load_model(model="v1_marco_de", use_cuda=True, batch_siz
 q_embs = dual_encoder.encode_query(query=query_list)
 p_embs = dual_encoder.encode_para(para=para_list)
 # compute inner product of query representation and para representation
-inner_products = dual_encoder.matching(query=query_list, para=para_list, title=title_list)
+inner_products = dual_encoder.matching(query=query_list, para=para_list)
 ```
 
 ### Run Self-development Model
