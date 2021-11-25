@@ -2,9 +2,9 @@
 version: '1'
 executors:
   - name: du_encoder
-    uses: DualEncoder
+    uses: RocketQADualEncoder
     py_module:
-        - executors.py
+        - rocketqa_encoder/executor.py
     uses_with:
         model: v1_marco_de
         use_cuda: $JINA_USE_CUDA

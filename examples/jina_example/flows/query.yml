@@ -6,13 +6,13 @@ with:
   cors: True
 executors:
   - name: du_encoder
-    uses: DualEncoder
+    uses: RocketQADualEncoder
     py_module:
-        - executors.py
+        - rocketqa_encoder/executor.py
     uses_with:
         model: v1_marco_de
         use_cuda: $JINA_USE_CUDA
-        device_id: 1
+        device_id: 0
         batch_size: 1
     timeout_ready: '-1'
   - name: vec_indexer
@@ -20,12 +20,12 @@ executors:
     uses_metas:
       workspace: $JINA_WORKSPACE
   - name: ranker
-    uses: CrossEncoder
+    uses: RocketQAMatcher
     py_module:
-        - executors.py
+        - rocketqa_matcher/executor.py
     uses_with:
         model: v1_marco_de
         use_cuda: $JINA_USE_CUDA
-        device_id: 0
+        device_id: 1
         batch_size: 32
     timeout_ready: '-1'
