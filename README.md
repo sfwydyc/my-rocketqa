@@ -1,13 +1,13 @@
 # RocketQA End-to-End QA-system Development Tool
 
-This repository provides a simple and efficient toolkit for running RocketQA models and build a QA-system. 
+This repository provides a simple and efficient toolkit for running RocketQA models and build a Question Answering (QA) system. 
 
 ## RocketQA
-**RocketQA** is a series of dense retrieval models for Open-Domain Question Answering. 
+**RocketQA** is a series of dense retrieval models for Open-Domain QA. 
 
-Open-Domain Question Answering aims to find the answers to natural language questions from a large collection of documents. Common approachs often contain two stages, firstly a dense retriever select a few revelant contexts, and then a neural reader extracts the answer.
+Open-Domain QA aims to find the answers of natural language questions from a large collection of documents. Common approaches often contain two stages, firstly a dense retriever selects a few relevant contexts, and then a neural reader extracts the answer.
 
-RocketQA focus on improving the dense contexts retrieval stage, and propose the following methods:
+RocketQA focuses on improving the dense contexts retrieval stage, and propose the following methods:
 #### 1. [RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering](https://arxiv.org/pdf/2010.08191.pdf)
 
 #### 2. [PAIR: Leveraging Passage-Centric Similarity Relation for Improving Dense Passage Retrieval](https://aclanthology.org/2021.findings-acl.191.pdf)
@@ -16,7 +16,7 @@ RocketQA focus on improving the dense contexts retrieval stage, and propose the 
 
 
 ## Features
-* ***State-of-the-art***, RocketQA models achieve SOTA performance in MSMARCO passage ranking dataset and Natural Question dataset.
+* ***State-of-the-art***, RocketQA models achieve SOTA performance on MSMARCO passage ranking dataset and Natural Question dataset.
 * ***First-Chinese-model***, RocketQA-zh is the first open source Chinese dense retrieval model.
 * ***Easy-to-use***, both python installation package and DOCKER environment are provided.
 * ***Solution-for-QA-system***, developers can build an End-to-End QA system with one line of code.
@@ -52,7 +52,7 @@ docker run -it rocketqa_docker_name
   
   
 ## API
-The RocketQA development tool provides two kind of models, one is ERNIE-based dual-encoder for answer retrieval, anthor is ERNIE-based cross encoder for answer reranking. And development tool provides the following methods:
+The RocketQA development tool supports two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. And the development tool provides the following methods:
 
 #### `rocketqa.available_models()`
 
@@ -60,7 +60,7 @@ Returns the names of the available RocketQA models.
 
 #### `rocketqa.load_model(model, use_cuda=False, device_id=0, batch_size=1)`
 
-Returns the model specifiecd by input parameter. Both dual encoder and cross encoder can be initialized by this method. With input parameter, developers can load RocketQA models returned by "available_models()" or their own checkpoints.
+Returns the model specified by the input parameter. Both dual encoder and cross encoder can be initialized by this method. With input parameter, developers can load RocketQA models returned by "available_models()" or their own checkpoints.
 
 ---
 
@@ -68,15 +68,15 @@ Dual-encoder returned by "load_model()" supports the following methods:
 
 #### `model.encode_query(query: List[str])`
 
-Given a list of queries, returns vector representations encoded by model.
+Given a list of queries, returns their representation vectors encoded by model.
 
 #### `model.encode_para(para: List[str], )`
 
-Given a list of passages and their corresponding titles (optional), returns vector representations encoded by model.
+Given a list of passages and their corresponding titles (optional), returns their representations vectors encoded by model.
 
 #### `model.matching(query: List[str], para: List[str], )`
 
-Given a list of queries and passages (and titles), returns their matching scores (inner product of their representations). 
+Given a list of queries and passages (and titles), returns their matching scores (dot product between two representation vectors). 
 
 ---
 
@@ -84,7 +84,7 @@ Cross-encoder returned by "load_model()" supports the following method:
 
 #### `model.matching(query: List[str], para: List[str], )`
 
-Given a list of queries and passages (and titles), returns their matching scores (probability that paragraph is query's right answer).
+Given a list of queries and passages (and titles), returns their matching scores (probability that the paragraph is the query's right answer).
   
   
 
@@ -112,7 +112,7 @@ inner_products = dual_encoder.matching(query=query_list, para=para_list)
 ```
 
 ### Run Self-development Model
-To run checkpoints, developers should write a config file, and set the parameter `model` in 'load_model()' method with the path of the config fille.
+To run checkpoints, developers should write a config file, and set the parameter `model` in 'load_model()' method with the path of the config file.
 
 ```python
 import rocketqa
@@ -152,7 +152,7 @@ The config file is a JSON format file.
 
 ## Start your QA-System
 
-With the examples blow, you can build your own QA-System
+With the examples below, developers can build own QA-System
 
 ### Running with JINA
 ```bash
