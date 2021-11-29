@@ -193,7 +193,7 @@ class DualEncoder(object):
             for q, t, p in zip(query, title, para):
                 data.append(q + '\t' + t + '\t' + p)
         else:
-            for q, p in para:
+            for q, p in zip(query, para):
                 data.append(q + '\t-\t' + p)
 
         self.test_pyreader.decorate_tensor_provider(

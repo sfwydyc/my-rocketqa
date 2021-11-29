@@ -15,17 +15,17 @@ paddle.enable_static()
 warnings.simplefilter('ignore')
 
 __MODELS = {
-        "v1_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_marco_de.tar.gz",
-        "v1_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_marco_ce.tar.gz",
-        "v1_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_de.tar.gz",
-        "v1_nq_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_ce.tar.gz",
-        "pair_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_marco_de.tar.gz",
-        "pair_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_nq_de.tar.gz",
-        "v2_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_de.tar.gz",
-        "v2_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_ce.tar.gz",
-        "v2_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_nq_de.tar.gz",
-        "zh_dureader_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_de.tar.gz",
-        "zh_dureader_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_ce.tar.gz"
+        "v1_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_marco_de.tar.gz", # RocketQA v1 dual-encoder trained on MSMARCO
+        "v1_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_marco_ce.tar.gz", # RocketQA v1 cross-encoder trained on MSMARCO
+        "v1_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_de.tar.gz", # RocketQA v1 dual-encoder trained on Natural Question
+        "v1_nq_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v1_nq_ce.tar.gz", # RocketQA v1 cross-encoder trained on Natural Question
+        "pair_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_marco_de.tar.gz", # PAIR dual-encoder trained on MSMARCO
+        "pair_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/pair_nq_de.tar.gz", # PAIR dual-encoder trained on MSMARCO
+        "v2_marco_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_de.tar.gz", # RocketQA v2 dual-encoder trained on MSMARCO
+        "v2_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_ce.tar.gz", # RocketQA v2 cross-encoder trained on MSMARCO
+        "v2_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_nq_de.tar.gz", # RocketQA v2 dual-encoder trained on Natural Question
+        "zh_dureader_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_de.tar.gz", # RocketQA zh dual-encoder trained on Dureader
+        "zh_dureader_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_ce.tar.gz" # RocketQA zh cross-encoder trained on Dureader
 }
 
 __MODELS_MD5 = {
