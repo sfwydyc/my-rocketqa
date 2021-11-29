@@ -54,7 +54,7 @@ docker run -it rocketqa_docker_name
 ## API
 The RocketQA development tool supports two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. And the development tool provides the following methods:
 
-#### `rocketqa.available_models()`
+#### `[rocketqa.available_models()](https://github.com/sfwydyc/rocketqa/blob/faef4c83a82a424fae79c12e173ae048f78e4f10/rocketqa/rocketqa.py#L17)`
 
 Returns the names of the available RocketQA models. 
 
@@ -70,11 +70,11 @@ Dual-encoder returned by "load_model()" supports the following methods:
 
 Given a list of queries, returns their representation vectors encoded by model.
 
-#### `model.encode_para(para: List[str], )`
+#### `model.encode_para(para: List[str], title: List[str])`
 
 Given a list of passages and their corresponding titles (optional), returns their representations vectors encoded by model.
 
-#### `model.matching(query: List[str], para: List[str], )`
+#### `model.matching(query: List[str], para: List[str], title: List[str])`
 
 Given a list of queries and passages (and titles), returns their matching scores (dot product between two representation vectors). 
 
@@ -82,7 +82,7 @@ Given a list of queries and passages (and titles), returns their matching scores
 
 Cross-encoder returned by "load_model()" supports the following method:
 
-#### `model.matching(query: List[str], para: List[str], )`
+#### `model.matching(query: List[str], para: List[str], title: List[str])`
 
 Given a list of queries and passages (and titles), returns their matching scores (probability that the paragraph is the query's right answer).
   
@@ -107,8 +107,8 @@ dual_encoder = rocketqa.load_model(model="v1_marco_de", use_cuda=True, batch_siz
 # encode query & para
 q_embs = dual_encoder.encode_query(query=query_list)
 p_embs = dual_encoder.encode_para(para=para_list)
-# compute inner product of query representation and para representation
-inner_products = dual_encoder.matching(query=query_list, para=para_list)
+# compute dot product of query representation and para representation
+dot_products = dual_encoder.matching(query=query_list, para=para_list)
 ```
 
 ### Run Self-development Model
