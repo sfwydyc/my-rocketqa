@@ -1,4 +1,4 @@
-jtype: RocketQAMatcher
+jtype: RocketQAReranker
 metas:
   py_modules:
     - executor.py
