@@ -20,9 +20,9 @@ executors:
     uses_metas:
       workspace: $JINA_WORKSPACE
   - name: ranker
-    uses: RocketQAMatcher
+    uses: RocketQAReranker
     py_module:
-        - rocketqa_matcher/executor.py
+        - rocketqa_reranker/executor.py
     uses_with:
         model: v1_marco_de
         use_cuda: $JINA_USE_CUDA

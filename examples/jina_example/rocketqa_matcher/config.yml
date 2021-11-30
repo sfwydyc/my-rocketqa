@@ -1,4 +1,0 @@
-jtype: RocketQAMatcher
-metas:
-  py_modules:
-    - executor.py
