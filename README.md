@@ -93,20 +93,21 @@ Given a list of queries and passages (and titles), returns their matching scores
 With the examples below, developers can run RocketQA models or their own checkpoints. 
 
 ###  Run RocketQA Model
-To run RocketQA models, developers should set the parameter `model` in 'load_model()' method with RocketQA model name return by 'available_models()' method. 
+To run RocketQA models, developers should set the parameter `model` in 'load_model()' method with RocketQA model name return by 'available_models()' method.
 
 ```python
 import rocketqa
 
 query_list = ["trigeminal definition"]
-para_list = ["Definition of TRIGEMINAL. : of or relating to the trigeminal nerve.ADVERTISEMENT. of or relating to the trigeminal nerve. ADVERTISEMENT."]
+para_list = [
+    "Definition of TRIGEMINAL. : of or relating to the trigeminal nerve.ADVERTISEMENT. of or relating to the trigeminal nerve. ADVERTISEMENT."]
 
 # init dual encoder
 dual_encoder = rocketqa.load_model(model="v1_marco_de", use_cuda=True, batch_size=16)
 
 # encode query & para
-q_embs = dual_encoder.encode_query(query=query_list)
-p_embs = dual_encoder.encode_para(para=para_list)
+q_embs = dual_encoder.encode_question(query=query_list)
+p_embs = dual_encoder.encode_passage(para=para_list)
 # compute dot product of query representation and para representation
 dot_products = dual_encoder.matching(query=query_list, para=para_list)
 ```
