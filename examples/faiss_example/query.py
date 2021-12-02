@@ -2,7 +2,7 @@ import sys
 import requests
 import json
 
-SERVICE_ADD = 'http://10.12.35.41:8888/rocketqa'
+SERVICE_ADD = 'http://localhost:8888/rocketqa'
 TOPK = 5
 
 while 1:

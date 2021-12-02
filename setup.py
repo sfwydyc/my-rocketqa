@@ -15,7 +15,7 @@ import os
 import setuptools
 import sys
 
-long_description = "RocketQA software tools and examples, building on top of PaddlePaddle2.0."
+long_description = "RocketQA development tools and examples, building on top of PaddlePaddle2.0."
 
 with open("requirements.txt") as fin:
     REQUIRED_PACKAGES = fin.read()

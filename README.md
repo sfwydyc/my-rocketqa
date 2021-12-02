@@ -45,16 +45,16 @@ NOTE: RocketQA package MUST be running on Python3.6+ with [PaddlePaddle](https:/
 ### Download Docker environment
 
 ```bash
-docker pull rocketqa_docker_name
+docker pull rocketqa/rocketqa
 
-docker run -it rocketqa_docker_name
+docker run -it docker.io/rocketqa/rocketqa bash
 ```
-  
+
   
 ## API
 The RocketQA development tool supports two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. And the development tool provides the following methods:
 
-#### `[rocketqa.available_models()](https://github.com/sfwydyc/rocketqa/blob/faef4c83a82a424fae79c12e173ae048f78e4f10/rocketqa/rocketqa.py#L17)`
+#### [`rocketqa.available_models()`](https://github.com/sfwydyc/rocketqa/blob/faef4c83a82a424fae79c12e173ae048f78e4f10/rocketqa/rocketqa.py#L17)
 
 Returns the names of the available RocketQA models. 
 
