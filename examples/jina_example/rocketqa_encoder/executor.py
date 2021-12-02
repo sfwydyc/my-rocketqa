@@ -5,8 +5,9 @@ import rocketqa
 
 class RocketQADualEncoder(Executor):
     """
-    Calculate the `embedding` for `text` with RocketQA encoding model.
+    Calculate the `embedding` of the passages and questions with RocketQA Dual-Encoder models.
     """
+
     def __init__(self, model, use_cuda=False, device_id=0, batch_size=1, *args, **kwargs):
         """
         :param model: A model name return by `rocketqa.available_models()` or the path of an user-specified
@@ -19,20 +20,20 @@ class RocketQADualEncoder(Executor):
         self.b_s = batch_size
 
     @requests(on='/index')
-    def encode_para(self, docs, **kwargs):
-        batch_generator = (docs
-                           .traverse_flat(
-            traversal_paths=('r',),
-            filter_fn=lambda d: d.tags.get('title', None) is not None and d.tags.get('para', None) is not None)
-                           .batch(batch_size=self.b_s))
+    def encode_passage(self, docs, **kwargs):
+        batch_generator = (
+            docs.traverse_flat(
+                 traversal_paths='r',
+                 filter_fn=lambda d: d.tags.get('title', None) is not None and d.tags.get('para', None) is not None)
+                .batch(batch_size=self.b_s))
         for batch in batch_generator:
             titles, paras = batch.get_attributes('tags__title', 'tags__para')
-            para_embs = self.encoder.encode_para(para=paras, title=titles)
+            para_embs = self.encoder.encode_passage(para=paras, title=titles)
             for doc, emb in zip(batch, para_embs):
                 doc.embedding = emb.squeeze()
 
     @requests(on='/search')
-    def encode_query(self, docs, **kwargs):
+    def encode_question(self, docs, **kwargs):
         for doc in docs:
-            query_emb = self.encoder.encode_query(query=[doc.text])
+            query_emb = self.encoder.encode_question(query=[doc.text])
             doc.embedding = query_emb.squeeze()

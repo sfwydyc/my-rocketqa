@@ -6,7 +6,7 @@ from jina import Executor, Document, DocumentArray, requests
 from jina.types.score import NamedScore
 
 
-class RocketQAMatcher(Executor):
+class RocketQAReranker(Executor):
     """
     Re-rank the `matches` of a Document based on the relevance to the question stored in the `text` field with RocketQA matching model.
     """
