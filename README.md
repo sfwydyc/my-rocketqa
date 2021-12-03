@@ -1,6 +1,6 @@
 # RocketQA
 
-In recent years, the dense retrievers based on pre-trained language models have achieved remarkable progress. To facilitate more developers to easily use cutting edge technologies, this repository provides an easy-to-use toolkit for running and fine-tuning the state-of-the-art dense retrievers, namely **RocketQA**.
+In recent years, the dense retrievers based on pre-trained language models have achieved remarkable progress. To facilitate more developers to easily use cutting edge technologies, this repository provides an easy-to-use toolkit for running and fine-tuning the state-of-the-art dense retrievers, namely **RocketQA**. This toolkit has the following advantages:
 
 
 * ***State-of-the-art***: This toolkit provides well-trained RocketQA models, which achieve SOTA performance on many dense retrieval dataset, and will continue to update the latest models.
@@ -11,7 +11,7 @@ In recent years, the dense retrievers based on pre-trained language models have 
 
 ## Installation
 
-Two installation methods are supported: ***Python Installation Package*** and ***DOCKER Environment***
+We provide two installation methods: ***Python Installation Package*** and ***DOCKER Environment***
 
 ### Install with Python Package
 First, install [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html).
@@ -38,11 +38,35 @@ docker pull rocketqa/rocketqa
 docker run -it docker.io/rocketqa/rocketqa bash
 ```
 
-  
-## API
-We provide two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. 
+## Start your Question Answer (QA) System
 
----
+With the examples below, you can build your own QA-System.
+
+### Running with JINA
+[JINA](https://jina.ai/) is A cloud-native neural search framework to build SOTA and scalable deep learning search applications in minutes.
+Please view [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example) to see our example.
+
+
+### Running with Faiss
+We also provide an example built on [Faiss](https://github.com/facebookresearch/faiss)
+```bash
+cd examples/faiss_example/
+pip3 install -r requirements.txt
+
+# Index
+python3 index.py ${language} ${data_file} ${index_file}
+
+# Start service
+python3 rocketqa_service.py ${language} ${data_file} ${index_file}
+
+# request
+python3 query.py
+```
+
+
+## API
+RocketQA provides two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. To run RocketQA models and build your own QA-system, you can use the following functions.
+
 ### Load model
 
 #### [`rocketqa.available_models()`](https://github.com/PaddlePaddle/RocketQA/blob/3a99cf2720486df8cc54acc0e9ce4cbcee993413/rocketqa/rocketqa.py#L17)
@@ -54,7 +78,6 @@ To know more about the available models, please click the function namei and see
 
 Returns the model specified by the input parameter. Both dual encoder and cross encoder can be initialized by this method. With input parameter, you can load RocketQA models returned by "available_models()" or their own checkpoints.
 
----
 ### Dual encoder
 Dual-encoder returned by "load_model()" supports the following methods:
 
@@ -70,7 +93,6 @@ Given a list of passages and their corresponding titles (optional), returns thei
 
 Given a list of queries and passages (and titles), returns their matching scores (dot product between two representation vectors). 
 
----
 ### Croess encoder
 Cross-encoder returned by "load_model()" supports the following method:
 
@@ -142,32 +164,6 @@ ${YOUR_CONFIG} is a JSON format file.
 ```
   
 
-
-## Start your QA-System
-
-With the examples below, you can build own QA-System
-
-### Running with JINA
-```bash
-[JINA](https://jina.ai/) is A cloud-native neural search framework to build SOTA and scalable deep learning search applications in minutes.
-Please visit [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example) to see our example.
-```
-
-
-### Running with Faiss
-```bash
-cd examples/faiss_example/
-pip3 install -r requirements.txt
-
-# Index
-python3 index.py ${language} ${data_file} ${index_file}
-
-# Start service
-python3 rocketqa_service.py ${language} ${data_file} ${index_file}
-
-# request
-python3 query.py
-```
 
 #### 1. [RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering](https://arxiv.org/pdf/2010.08191.pdf)
 
