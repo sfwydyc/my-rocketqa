@@ -1,22 +1,19 @@
 # RocketQA
 
-In recent years, the dense retrivers based on pre-trained language models have achieved remarkable progress. To facilitate more developers to easily use cutting edge technologies, this repository provides an easy-to-use toolkit for running and fine-tuning the state-of-the-art dense retrievers, namely **RocketQA**. The toolkit provides multiple models for both English and Chinese (trained on [DuReader](https://github.com/baidu/DuReader)), and will continue to update the latest models. By integrating with [JINA](https://jina.ai/), this repository also provides an example to build an end-to-end question answering system based on **RocketQA**. 
+In recent years, the dense retrievers based on pre-trained language models have achieved remarkable progress. To facilitate more developers to easily use cutting edge technologies, this repository provides an easy-to-use toolkit for running and fine-tuning the state-of-the-art dense retrievers, namely **RocketQA**.
 
-## Features
-* ***State-of-the-art***
-This toolkit provides well-trained RocketQA models. RocketQA is a series of dense retrieval models for knowledge intensive tasks, including question answering, web search, dialogue, etc. It achieves SOTA performance on many dense retrieval dataset.
-* ***First-Chinese-model***
-This toolkit also provides the first open source Chinese dense retrieval model, which is trained on millions of manual annotation query-passage data from DuReader dataset.
-* ***Easy-to-use***
-Developers can install this toolkits and build a QA system with only two lines of code.
-  
+
+* ***State-of-the-art***: This toolkit provides well-trained RocketQA models, which achieve SOTA performance on many dense retrieval dataset, and will continue to update the latest models.
+* ***First-Chinese-model***: This toolkit provides the first open source Chinese dense retrieval model, which is trained on millions of manual annotation query-passage data from [DuReader dataset](https://github.com/baidu/DuReader).
+* ***Easy-to-use***: By integrating with [JINA](https://jina.ai/), this toolkit provides an example to build an end-to-end question answering system with several lines of code.
+
   
 
 ## Installation
 
-This repository provides two installation methods:
+Two installation methods are supported: ***Python Installation Package*** and ***DOCKER Environment***
 
-### Install python package
+### Install with Python Package
 First, install [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html).
 ```bash
 # GPU version:
@@ -31,9 +28,9 @@ Second, install rocketqa package:
 $ pip install rocketqa
 ```
 
-NOTE: RocketQA package MUST be running on Python3.6+ with [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) 2.0+ :
+NOTE: this toolkit MUST be running on Python3.6+ with [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) 2.0+ :
 
-### Download Docker environment
+### Install with Docker
 
 ```bash
 docker pull rocketqa/rocketqa
@@ -43,18 +40,22 @@ docker run -it docker.io/rocketqa/rocketqa bash
 
   
 ## API
-The RocketQA development tool supports two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. And the development tool provides the following methods:
+We provide two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. 
+
+---
+### Load model
 
 #### [`rocketqa.available_models()`](https://github.com/PaddlePaddle/RocketQA/blob/3a99cf2720486df8cc54acc0e9ce4cbcee993413/rocketqa/rocketqa.py#L17)
 
-Returns the names of the available RocketQA models. 
+Returns the names of the available RocketQA models.
+To know more about the available models, please click the function namei and see the code comment.
 
 #### [`rocketqa.load_model(model, use_cuda=False, device_id=0, batch_size=1)`](https://github.com/PaddlePaddle/RocketQA/blob/3a99cf2720486df8cc54acc0e9ce4cbcee993413/rocketqa/rocketqa.py#L52)
 
-Returns the model specified by the input parameter. Both dual encoder and cross encoder can be initialized by this method. With input parameter, developers can load RocketQA models returned by "available_models()" or their own checkpoints.
+Returns the model specified by the input parameter. Both dual encoder and cross encoder can be initialized by this method. With input parameter, you can load RocketQA models returned by "available_models()" or their own checkpoints.
 
 ---
-
+### Dual encoder
 Dual-encoder returned by "load_model()" supports the following methods:
 
 #### [`model.encode_query(query: List[str])`](https://github.com/PaddlePaddle/RocketQA/blob/3a99cf2720486df8cc54acc0e9ce4cbcee993413/rocketqa/predict/dual_encoder.py#L126)
@@ -70,7 +71,7 @@ Given a list of passages and their corresponding titles (optional), returns thei
 Given a list of queries and passages (and titles), returns their matching scores (dot product between two representation vectors). 
 
 ---
-
+### Croess encoder
 Cross-encoder returned by "load_model()" supports the following method:
 
 #### [`model.matching(query: List[str], para: List[str], title: List[str])`](https://github.com/PaddlePaddle/RocketQA/blob/3a99cf2720486df8cc54acc0e9ce4cbcee993413/rocketqa/predict/cross_encoder.py#L129)
@@ -81,10 +82,10 @@ Given a list of queries and passages (and titles), returns their matching scores
 
 ## Examples
 
-With the examples below, developers can run RocketQA models or their own checkpoints. 
+Following the examples below, you can run RocketQA models and your own checkpoints. 
 
 ###  Run RocketQA Model
-To run RocketQA models, developers should set the parameter `model` in 'load_model()' method with RocketQA model name return by 'available_models()' method.
+To run RocketQA models, you should set the parameter `model` in 'load_model()' method with RocketQA model name return by 'available_models()' method.
 
 ```python
 import rocketqa
@@ -97,14 +98,14 @@ para_list = [
 dual_encoder = rocketqa.load_model(model="v1_marco_de", use_cuda=True, batch_size=16)
 
 # encode query & para
-q_embs = dual_encoder.encode_question(query=query_list)
-p_embs = dual_encoder.encode_passage(para=para_list)
+q_embs = dual_encoder.encode_query(query=query_list)
+p_embs = dual_encoder.encode_para(para=para_list)
 # compute dot product of query representation and para representation
 dot_products = dual_encoder.matching(query=query_list, para=para_list)
 ```
 
 ### Run Self-development Model
-To run checkpoints, developers should write a config file, and set the parameter `model` in 'load_model()' method with the path of the config file.
+To run your own checkpoints, you should write a config file, and set the parameter `model` in 'load_model()' method with the path of the config file.
 
 ```python
 import rocketqa
@@ -115,7 +116,7 @@ para_list = ["交叉验证(Cross-validation)主要用于建模应用中，例如
 
 # conf
 ce_conf = {
-    "model": "./own_model/config.json",     # path of config file
+    "model": ${YOUR_CONFIG},     # path of config file
     "use_cuda": True,
     "device_id": 0,
     "batch_size": 16
@@ -128,7 +129,7 @@ cross_encoder = rocketqa.load_model(**ce_conf)
 ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
 ```
 
-The config file is a JSON format file.
+${YOUR_CONFIG} is a JSON format file.
 ```bash
 {
     "model_type": "cross_encoder",
@@ -144,26 +145,16 @@ The config file is a JSON format file.
 
 ## Start your QA-System
 
-With the examples below, developers can build own QA-System
+With the examples below, you can build own QA-System
 
 ### Running with JINA
 ```bash
-cd examples/jina_example/
-pip3 install -r requirements.txt
-
-# Index
-python3 app.py index
-
-# Search
-python3 app.py query
-
-To know more, please visit [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example)
+[JINA](https://jina.ai/) is A cloud-native neural search framework to build SOTA and scalable deep learning search applications in minutes.
+Please visit [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example) to see our example.
 ```
 
 
-
 ### Running with Faiss
-
 ```bash
 cd examples/faiss_example/
 pip3 install -r requirements.txt
