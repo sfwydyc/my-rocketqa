@@ -3,7 +3,7 @@
 In recent years, the dense retrievers based on pre-trained language models have achieved remarkable progress. To facilitate more developers using cutting edge technologies, this repository provides an easy-to-use toolkit for running and fine-tuning the state-of-the-art dense retrievers, namely **RocketQA**. This toolkit has the following advantages:
 
 
-* ***State-of-the-art***: It provides well-trained RocketQA models, which achieve SOTA performance on many dense retrieval datasets. And it will continue to update the latest models.
+* ***State-of-the-art***: It provides well-trained RocketQA models, which achieve SOTA performance on many dense retrieval datasets. And it will continue to update the [latest models](https://github.com/PaddlePaddle/RocketQA#news).
 * ***First-Chinese-model***: It provides the first open source Chinese dense retrieval model, which is trained on millions of manual annotation data from [DuReader](https://github.com/baidu/DuReader).
 * ***Easy-to-use***: By integrating this toolkit with [JINA](https://jina.ai/), developers can build an end-to-end question answering system with several lines of code.
 
