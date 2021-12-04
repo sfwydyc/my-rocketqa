@@ -170,6 +170,11 @@ ${YOUR_CONFIG} is a JSON format file.
     "joint_training": 0
 }
 ```
+
+## News
+* August 26, 2021: [RocketQA v2](https://arxiv.org/pdf/2110.07367.pdf) was accepted by EMNLP 2021.
+* May 5, 2021: [PAIR](https://aclanthology.org/2021.findings-acl.191.pdf) was accepted by ACL 2021
+* March 11, 2021: [RocketQA v1](https://arxiv.org/pdf/2010.08191.pdf) was accepted by NAACL 2021.
   
 ## Citing & Authors
 
@@ -203,7 +208,6 @@ If you find RocketQA v2 models helpful, feel free to cite our publication [Rocke
     booktitle = "Preprint"
 }
 ```
-## News
 
 
 ## License
