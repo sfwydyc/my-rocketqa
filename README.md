@@ -5,7 +5,7 @@ In recent years, the dense retrievers based on pre-trained language models have 
 
 * ***State-of-the-art***: It provides well-trained RocketQA models, which achieve SOTA performance on many dense retrieval datasets. And it will continue to update the latest models.
 * ***First-Chinese-model***: This toolkit provides the first open source Chinese dense retrieval model, which is trained on millions of manual annotation data from [DuReader dataset](https://github.com/baidu/DuReader).
-* ***Easy-to-use***: By integrating this toolkit with [JINA](https://jina.ai/), developers can build an end-to-end question answering system with several lines of code.
+* ***Easy-to-use***: By integrating this toolkit with [JINA](https://jina.ai/) or FAISS, developers can build an end-to-end question answering system with several lines of code.
 
 
 ## Installation
@@ -40,12 +40,22 @@ docker run -it docker.io/rocketqa/rocketqa bash
 
 ## Start your Question Answer (QA) System
 
-With the examples below, you can build your own QA-System.
+Refer to the examples below, you can build your own QA-System with several lines of code.
 
 ### Running with JINA
-[JINA](https://jina.ai/) is a cloud-native neural search framework to build SOTA and scalable deep learning search applications in minutes.
-Please view [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example) to see our example.
+[JINA](https://jina.ai/) is a cloud-native neural search framework to build SOTA and scalable deep learning search applications in minutes. Here is a simple example to build a QA-system based on JINA and RocketQA.
 
+```bash
+cd examples/jina_example
+pip3 install -r requirements.txt
+
+# Index
+python3 app.py index toy_data/test.tsv
+
+# Query
+python3 app.py query_cli
+```
+Please view [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example) to see our example.
 
 ### Running with Faiss
 We also provide a simple example built on [Faiss](https://github.com/facebookresearch/faiss)
@@ -54,10 +64,10 @@ cd examples/faiss_example/
 pip3 install -r requirements.txt
 
 # Index
-python3 index.py ${language} ${data_file} ${index_file}
+python3 index.py en ../marco.tp.1k marco_index
 
 # Start service
-python3 rocketqa_service.py ${language} ${data_file} ${index_file}
+python3 rocketqa_service.py en ../marco.tp.1k marco_index
 
 # request
 python3 query.py
@@ -65,7 +75,7 @@ python3 query.py
 
 
 ## API
-RocketQA provides two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. For running RocketQA models and building your own QA-system, you can use the following functions.
+RocketQA and our toolkit provide two types of models, ERNIE-based dual encoder for answer retrieval and ERNIE-based cross encoder for answer re-ranking. For running RocketQA models and your own checkpoints, you can use the following functions.
 
 ### Load model
 
@@ -165,12 +175,14 @@ ${YOUR_CONFIG} is a JSON format file.
 ## Citing & Authors
 
 If you find RocketQA v1 models (v1*) helpful, feel free to cite our publication [RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering](https://arxiv.org/pdf/2010.08191.pdf)
+```
 @inproceedings{unilmv2,
     title="RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering",
     author="",
     year="2020",
     booktitle = "Preprint"
 }
+```
 
 If you find PAIR models (pair*) helpful, feel free to cite our publication [PAIR: Leveraging Passage-Centric Similarity Relation for Improving Dense Passage Retrieval](https://aclanthology.org/2021.findings-acl.191.pdf)
 
