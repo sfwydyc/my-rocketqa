@@ -1,2 +1,2 @@
-git+https://github.com/sfwydyc/rocketqa.git
-paddlepaddle>=2.2.0
+paddlepaddle>=2.0
+rocketqa~=1.0.0
