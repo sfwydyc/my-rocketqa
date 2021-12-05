@@ -236,3 +236,8 @@ cross_encoder = rocketqa.load_model(model="v1_marco_ce", use_cuda=True, device_i
 # compute matching score of query and para
 ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
 ```
+
+```python
+import rocketqa
+rocketqa.rocketqa.available_models()
+```
