@@ -48,10 +48,10 @@ Refer to the examples below, you can build your own QA-System with several lines
 cd examples/jina_example
 pip3 install -r requirements.txt
 
-# Index
+# Index: build a QA-system
 python3 app.py index toy_data/test.tsv
 
-# Query
+# Query: search for results
 python3 app.py query_cli
 ```
 Please view [JINA example](https://github.com/PaddlePaddle/RocketQA/tree/main/examples/jina_example) to know more.
@@ -62,13 +62,13 @@ We also provide a simple example built on [Faiss](https://github.com/facebookres
 cd examples/faiss_example/
 pip3 install -r requirements.txt
 
-# Index
+# Index: transform text to semantic-index
 python3 index.py en ../marco.tp.1k marco_index
 
-# Start service
+# Start service: start QA-system
 python3 rocketqa_service.py en ../marco.tp.1k marco_index
 
-# request
+# Query: search for results
 python3 query.py
 ```
 
@@ -239,5 +239,5 @@ ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=t
 
 ```python
 import rocketqa
-rocketqa.rocketqa.available_models()
+model_name_list = rocketqa.rocketqa.available_models()
 ```
