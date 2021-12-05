@@ -212,3 +212,27 @@ If you find RocketQA v2 models helpful, feel free to cite our publication [Rocke
 
 ## License
 This repository is provided under the [Apache-2.0 license](https://github.com/PaddlePaddle/RocketQA/blob/main/LICENSE).
+
+
+
+```python
+import rocketqa
+
+query_list = ["trigeminal definition"]
+para_list = [
+    "Definition of TRIGEMINAL: of or relating to the trigeminal nerve.ADVERTISEMENT."]
+
+# init dual-encoder
+dual_encoder = rocketqa.load_model(model="v1_marco_de", use_cuda=True, device_id=0, batch_size=16)
+
+# encode query & para
+q_embs = dual_encoder.encode_query(query=query_list)
+p_embs = dual_encoder.encode_para(para=para_list)
+# compute dot product of query representation and para representation
+dot_products = dual_encoder.matching(query=query_list, para=para_list)
+
+# init cross-encoder
+cross_encoder = rocketqa.load_model(model="v1_marco_ce", use_cuda=True, device_id=0, batch_size=16)
+# compute matching score of query and para
+ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=title_list)
+```
