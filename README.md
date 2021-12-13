@@ -248,4 +248,4 @@ For help or issues using RocketQA, please submit a Github issue.
 
 For other communication or cooperation, please contact Jing Liu (liujing46@baidu.com) or scan the following QR Code.
 
-![image](https://github.com/PaddlePaddle/RocketQA/blob/main/BaiduNLP-QRCode.png)
+![image](https://github.com/PaddlePaddle/RocketQA/blob/main/BaiduNLP-QRCode.png){:width="300px" height="300px"}
