@@ -48,7 +48,7 @@ Refer to the examples below, you can build your own QA-System with several lines
 cd examples/jina_example
 pip3 install -r requirements.txt
 
-# Index: build a QA-system
+# Index: build a Search Engine
 python3 app.py index toy_data/test.tsv
 
 # Query: search for results
@@ -65,7 +65,7 @@ pip3 install -r requirements.txt
 # Index: transform text to semantic-index
 python3 index.py en ../marco.tp.1k marco_index
 
-# Start service: start QA-system
+# Start service: start Search Engine
 python3 rocketqa_service.py en ../marco.tp.1k marco_index
 
 # Query: search for results
@@ -241,3 +241,11 @@ ranking_score = cross_encoder.matching(query=query_list, para=para_list, title=t
 import rocketqa
 model_name_list = rocketqa.rocketqa.available_models()
 ```
+
+## Contact Information
+For help or issues using RocketQA, please submit a Github issue.
+
+
+For other communication or cooperation, please contact Jing Liu (liujing46@baidu.com) or scan the following QR Code.
+
+![image](https://github.com/PaddlePaddle/RocketQA/blob/main/BaiduNLP-QRCode.png)
