@@ -44,6 +44,7 @@ class RocketQAReranker(Executor):
                 score = reranked_scores[idx]
                 m = Document(
                     id=unsorted_matches[idx].id,
+                    text=unsorted_matches[idx].tags['para'],
                     tags={
                         'title': unsorted_matches[idx].tags['title'],
                         'para': unsorted_matches[idx].tags['para']
