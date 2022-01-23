@@ -11,7 +11,7 @@ In recent years, the dense retrievers based on pre-trained language models have 
 
 * ***State-of-the-art***: 🚀RocketQA provides our well-trained models, which achieve SOTA performance on many dense retrieval datasets. And it will continue to update the [latest models](https://github.com/PaddlePaddle/RocketQA#news).
 * ***First-Chinese-model***: 🚀RocketQA provides the first open source Chinese dense retrieval model, which is trained on millions of manual annotation data from [DuReader](https://github.com/baidu/DuReader).
-* ***Easy-to-use***: By integrating this toolkit with [JINA](https://jina.ai/), 🚀RocketQA can help developers build an end-to-end question answering system with several lines of code. <img src="https://github.com/PaddlePaddle/RocketQA/blob/main/RocketQA_flow.png" alt="" align=center />  
+* ***Easy-to-use***: By integrating this toolkit with [JINA](https://jina.ai/), 🚀RocketQA can help developers build an end-to-end question answering system with several lines of code. <img src="https://github.com/sfwydyc/rocketqa/blob/main/RocketQA_flow.png" alt="" align=center />  
 
 
 ## Installation
