@@ -8,8 +8,8 @@ import tarfile
 import warnings
 import hashlib
 from tqdm import tqdm
-from rocketqa.predict.dual_encoder import DualEncoder
-from rocketqa.predict.cross_encoder import CrossEncoder
+from rocketqa.encoder.dual_encoder import DualEncoder
+from rocketqa.encoder.cross_encoder import CrossEncoder
 
 paddle.enable_static()
 warnings.simplefilter('ignore')
@@ -25,7 +25,9 @@ __MODELS = {
         "v2_marco_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_marco_ce.tar.gz",       # RocketQA v2 cross-encoder trained on MSMARCO
         "v2_nq_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/v2_nq_de.tar.gz",             # RocketQA v2 dual-encoder trained on Natural Question
         "zh_dureader_de": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_de.tar.gz", # RocketQA zh dual-encoder trained on Dureader
-        "zh_dureader_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_ce.tar.gz"  # RocketQA zh cross-encoder trained on Dureader
+        "zh_dureader_ce": "http://rocketqa.bj.bcebos.com/RocketQAModels/zh_dureader_ce.tar.gz", # RocketQA zh cross-encoder trained on Dureader
+        "dureader_de_v2": "123",
+        "dureader_ce_v2": "123"
 }
 
 __MODELS_MD5 = {
@@ -39,7 +41,9 @@ __MODELS_MD5 = {
         "v2_marco_ce": "915ea7ff214a4a92a3a1e1d56c3fb469",
         "v2_nq_de": "8f177aa75cadaad6656dcd981edc983b",
         "zh_dureader_de": "673ff667bdb3b315a7e2e1b5624babc4",
-        "zh_dureader_ce": "5e8e6a026e1cb7600fc7e9250f79beb1"
+        "zh_dureader_ce": "5e8e6a026e1cb7600fc7e9250f79beb1",
+        "dureader_de_v2": "1",
+        "dureader_ce_v2": "2"
 }
 
 def available_models():
