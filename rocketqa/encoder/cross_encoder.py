@@ -55,7 +55,7 @@ class CrossEncoder(object):
         else:
             args.model_name = "my_ce"
         args.use_cuda = use_cuda
-        self.batch_size = batch_size
+        args.batch_size = batch_size
         self.ernie_config = ErnieConfig(args.ernie_config_path)
         #ernie_config.print_config()
 
@@ -132,21 +132,27 @@ class CrossEncoder(object):
 
         return args
 
-    def _parse_train_args(self, conf_path):
-        with open(conf_path, 'r', encoding='utf8') as json_file:
-            config_dict = json.load(json_file)
+    def _parse_train_args(self, train_set, epoch, save_model_path, config_dict):
 
-            self.args.batch_size = config_dict['batch_size']
-            self.args.train_set = config_dict['train_set']
-            self.args.save_model_path = config_dict['save_model_path']
+        self.args.train_set = train_set
+        self.args.save_model_path = save_model_path
+        self.args.epoch = epoch
+
+        if "save_steps" in config_dict:
             self.args.save_steps = config_dict['save_steps']
-            self.args.epoch = config_dict['epoch']
-            if 'learning_rate' in config_dict:
-                self.args.learning_rate = config_dict['learning_rate']
-            else:
-                self.args.learning_rate = 2e-5
-            if 'log_folder' in config_dict:
-                self.args.log_folder = config_dict['log_folder']
+        else:
+            self.args.save_steps = 0
+
+        for key in config_dict:
+            print ("{} {}".format(key, config_dict[key]))
+        if "batch_size" in config_dict:
+            self.args.batch_size = config_dict['batch_size']
+        if 'learning_rate' in config_dict:
+            self.args.learning_rate = config_dict['learning_rate']
+        else:
+            self.args.learning_rate = 2e-5
+        if 'log_folder' in config_dict:
+            self.args.log_folder = config_dict['log_folder']
 
 
     def matching(self, query, para, title=[]):
@@ -164,7 +170,7 @@ class CrossEncoder(object):
         self.test_pyreader.decorate_tensor_provider(
             self.predict_reader.data_generator(
                 data,
-                batch_size=self.batch_size,
+                batch_size=self.args.batch_size,
                 shuffle=False))
 
         self.test_pyreader.start()
@@ -186,9 +192,9 @@ class CrossEncoder(object):
                 break
         return
 
-    def train(self, config_path):
+    def train(self, train_set, epoch, save_model_path, **kwargs):
+        self._parse_train_args(train_set, epoch, save_model_path, kwargs)
         args = self.args
-        self._parse_train_args(config_path)
         print_arguments(args)
         check_cuda(args.use_cuda)
         log = logging.getLogger()
@@ -225,12 +231,17 @@ class CrossEncoder(object):
             phase="train")
 
         num_train_examples = reader.get_num_examples(args.train_set)
+        if self.args.save_steps == 0:
+            self.args.save_steps = num_train_examples * self.args.epoch // self.args.batch_size // 2
+        print (self.args.save_steps)
+        print (self.args.learning_rate)
+        print (self.args.batch_size)
 
-        if args.in_tokens:
-            max_train_steps = args.epoch * num_train_examples // (
-                args.batch_size // args.max_seq_len) // dev_count
-        else:
-            max_train_steps = args.epoch * num_train_examples // args.batch_size // dev_count
+        #if args.in_tokens:
+        #    max_train_steps = args.epoch * num_train_examples // (
+        #        args.batch_size // args.max_seq_len) // dev_count
+        #else:
+        max_train_steps = args.epoch * num_train_examples // args.batch_size // dev_count
 
         warmup_steps = int(max_train_steps * args.warmup_proportion)
         log.info("Device count: %d" % dev_count)
@@ -281,21 +292,6 @@ class CrossEncoder(object):
             self.exe,
             args.init_checkpoint,
             main_program=startup_prog)
-        """
-        exec_strategy = fluid.ExecutionStrategy()
-        if args.use_fast_executor:
-            exec_strategy.use_experimental_executor = True
-        exec_strategy.num_threads = dev_count
-        exec_strategy.num_iteration_per_drop_scope = args.num_iteration_per_drop_scope
-
-        train_exe = fluid.ParallelExecutor(
-            use_cuda=args.use_cuda,
-            loss_name=graph_vars["loss"].name,
-            exec_strategy=exec_strategy,
-            main_program=train_program,
-            num_trainers=nccl2_num_trainers,
-            trainer_id=nccl2_trainer_id)
-        """
 
         train_pyreader.decorate_tensor_provider(train_data_generator)
         train_pyreader.start()

@@ -56,7 +56,7 @@ class DualEncoder(object):
         args.use_cuda = use_cuda
         self.ernie_config = ErnieConfig(args.ernie_config_path)
         #ernie_config.print_config()
-        self.batch_size = batch_size
+        args.batch_size = batch_size
 
         if args.use_cuda:
             dev_list = fluid.cuda_places()
@@ -157,7 +157,7 @@ class DualEncoder(object):
         self.test_pyreader.decorate_tensor_provider(
             self.predict_reader.data_generator(
                 data,
-                self.batch_size,
+                self.args.batch_size,
                 shuffle=False))
 
         self.test_pyreader.start()
@@ -190,7 +190,7 @@ class DualEncoder(object):
         self.test_pyreader.decorate_tensor_provider(
             self.predict_reader.data_generator(
                 data,
-                self.batch_size,
+                self.args.batch_size,
                 shuffle=False))
 
         self.test_pyreader.start()
@@ -224,7 +224,7 @@ class DualEncoder(object):
         self.test_pyreader.decorate_tensor_provider(
             self.predict_reader.data_generator(
                 data,
-                self.batch_size,
+                self.args.batch_size,
                 shuffle=False))
 
         self.test_pyreader.start()
@@ -284,16 +284,7 @@ class DualEncoder(object):
         num_train_examples = reader.get_num_examples(self.args.train_set)
         if self.args.save_steps == 0:
             self.args.save_steps = num_train_examples * self.args.epoch // self.args.batch_size // 2
-        print (self.args.save_steps)
-        print (self.args.learning_rate)
-        print (self.args.batch_size)
 
-        #if self.args.in_tokens:
-        #    if self.args.batch_size < self.args.max_seq_len:
-        #        raise ValueError('if in_tokens=True, batch_size should greater than max_sqelen, got batch_size:%d seqlen:%d' % (self.args.batch_size, self.args.max_seq_len))
-        #    max_train_steps = self.args.epoch * num_train_examples // (
-        #        self.args.batch_size // self.args.max_seq_len) // dev_count
-        #else:
         max_train_steps = self.args.epoch * num_train_examples // self.args.batch_size // dev_count
 
         warmup_steps = int(max_train_steps * self.args.warmup_proportion)
