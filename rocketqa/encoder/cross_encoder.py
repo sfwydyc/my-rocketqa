@@ -176,11 +176,9 @@ class CrossEncoder(object):
                                             fetch_list=fetch_list)
                 np_probs = fetch_result[0]
                 if self.joint_training == 0:
-                    #probs.extend(np_probs[:, 1].reshape(-1).tolist())
                     for data_prob in np_probs[:, 1].reshape(-1).tolist():
                         yield data_prob
                 else:
-                    #probs.extend(np_probs.reshape(-1).tolist())
                     for data_prob in np_probs.reshape(-1).tolist():
                         yield data_prob
             except fluid.core.EOFException:
@@ -279,6 +277,10 @@ class CrossEncoder(object):
 
         self.exe.run(startup_prog)
 
+        init_pretraining_params(
+            self.exe,
+            args.init_checkpoint,
+            main_program=startup_prog)
         """
         exec_strategy = fluid.ExecutionStrategy()
         if args.use_fast_executor:

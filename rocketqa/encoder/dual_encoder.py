@@ -128,21 +128,25 @@ class DualEncoder(object):
 
         return args
 
-    def _parse_train_args(self, conf_path):
-        with open(conf_path, 'r', encoding='utf8') as json_file:
-            config_dict = json.load(json_file)
+    def _parse_train_args(self, train_set, epoch, save_model_path, config_dict):
 
-            self.args.batch_size = config_dict['batch_size']
-            self.args.train_set = config_dict['train_set']
-            self.args.save_model_path = config_dict['save_model_path']
+        self.args.train_set = train_set
+        self.args.save_model_path = save_model_path
+        self.args.epoch = epoch
+
+        if "save_steps" in config_dict:
             self.args.save_steps = config_dict['save_steps']
-            self.args.epoch = config_dict['epoch']
-            if 'learning_rate' in config_dict:
-                self.args.learning_rate = config_dict['learning_rate']
-            else:
-                self.args.learning_rate = 2e-5
-            if 'log_folder' in config_dict:
-                self.args.log_folder = config_dict['log_folder']
+        else:
+            self.args.save_steps = 0
+
+        if "batch_size" in config_dict:
+            self.args.batch_size = config_dict['batch_size']
+        if 'learning_rate' in config_dict:
+            self.args.learning_rate = config_dict['learning_rate']
+        else:
+            self.args.learning_rate = 2e-5
+        if 'log_folder' in config_dict:
+            self.args.log_folder = config_dict['log_folder']
 
     def encode_query(self, query):
 
@@ -240,8 +244,8 @@ class DualEncoder(object):
 
         return
 
-    def train(self, config_path):
-        self._parse_train_args(config_path)
+    def train(self, train_set, epoch, save_model_path, **kwargs):
+        self._parse_train_args(train_set, epoch, save_model_path, kwargs)
         print_arguments(self.args)
         check_cuda(self.args.use_cuda)
         log = logging.getLogger()
@@ -278,6 +282,11 @@ class DualEncoder(object):
             phase="train")
 
         num_train_examples = reader.get_num_examples(self.args.train_set)
+        if self.args.save_steps == 0:
+            self.args.save_steps = num_train_examples * self.args.epoch // self.args.batch_size // 2
+        print (self.args.save_steps)
+        print (self.args.learning_rate)
+        print (self.args.batch_size)
 
         #if self.args.in_tokens:
         #    if self.args.batch_size < self.args.max_seq_len:
@@ -325,6 +334,10 @@ class DualEncoder(object):
         #exe = fluid.Executor(place)
         self.exe.run(startup_prog)
 
+        init_pretraining_params(
+            self.exe,
+            self.args.init_checkpoint,
+            main_program=startup_prog)
         train_pyreader.decorate_tensor_provider(train_data_generator)
         train_pyreader.start()
         steps = 0

@@ -109,6 +109,10 @@ Given a list of paragraphs and their corresponding titles (optional), returns th
 
 Given a list of queries and paragraphs (and titles), returns their matching scores (dot product between two representation vectors). 
 
+#### model.train(train_set, epoch, save_model_path, args)
+
+Train Dual-encoder model according to parameters.  
+
 ### Cross encoder
 Cross-encoder returned by "load_model()" supports the following function:
 
